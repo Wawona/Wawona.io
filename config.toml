@@ -32,8 +32,9 @@ fancy_code = true
 menu = [
     { name = "/posts", url = "posts", weight = 1 },
     { name = "/docs", url = "docs", weight = 2 },
-    { name = "/gallery", url = "gallery", weight = 3 },
-    { name = "/download", url = "download", weight = 4 },
+    { name = "/faq", url = "faq", weight = 3 },
+    { name = "/gallery", url = "gallery", weight = 4 },
+    { name = "/download", url = "download", weight = 5 },
 ]
 
 socials = [
