@@ -97,6 +97,8 @@
                 link.host !== window.location.host ||
                 link.hasAttribute('download') ||
                 link.pathname.startsWith('/api/') ||
+                link.getAttribute('href') === '#' ||
+                link.hasAttribute('onclick') ||
                 e.ctrlKey || e.metaKey || e.shiftKey
             ) {
                 return;
@@ -108,10 +110,6 @@
             // Close the mobile menu automatically if it's open
             const rightNav = document.querySelector('.right-nav');
             if (rightNav) rightNav.classList.remove('active');
-
-            // If it's the same URL with different search/hash, we still want to handle highlighting
-            // but fetch might be redundant if we just want to highlight on same page.
-            // For now, let it fetch to be safe.
 
             try {
                 // Dim content to show loading
@@ -137,6 +135,11 @@
 
                     // Run highlighter
                     highlightOnPage();
+
+                    // Re-initialize dynamic elements
+                    if (window.initCodeBlocks) window.initCodeBlocks();
+                    if (window.initTOC) window.initTOC();
+                    if (window.initNotes) window.initNotes();
 
                     // Check banner state post-navigation
                     const banner = document.getElementById("donationBanner");
@@ -178,6 +181,11 @@
                     document.title = doc.title;
 
                     highlightOnPage();
+
+                    // Re-initialize dynamic elements
+                    if (window.initCodeBlocks) window.initCodeBlocks();
+                    if (window.initTOC) window.initTOC();
+                    if (window.initNotes) window.initNotes();
 
                     // Check banner state post-navigation
                     const banner = document.getElementById("donationBanner");

@@ -22,7 +22,7 @@ const getNonTableCode = (codeBlock) => {
     return codeBlock.textContent.trim();
 };
 
-document.addEventListener('DOMContentLoaded', function () {
+window.initCodeBlocks = function () {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const pre = entry.target.closest('pre') || entry.target.parentNode;
@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('pre code').forEach(codeBlock => {
         const pre = codeBlock.closest('pre') || codeBlock.parentNode;
+
+        // Skip if already initialized
+        if (pre.querySelector('.clipboard-button')) return;
+
         pre.style.position = 'relative';
 
         // Create and append the copy button
@@ -118,4 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-});
+};
+
+document.addEventListener('DOMContentLoaded', window.initCodeBlocks);

@@ -1,12 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-  let observer = new IntersectionObserver(handler, {
-    threshold: [0],
-  });
+window.initTOC = () => {
   let paragraphs = [...document.querySelectorAll("section > *")];
   let submenu = [...document.querySelectorAll(".toc a")];
 
+  if (paragraphs.length === 0 || submenu.length === 0) return;
+
+  let observer = new IntersectionObserver(handler, {
+    threshold: [0],
+  });
+
   function previousHeaderId(e) {
-    for (; e && !e.matches("h1, h2, h3, h4"); ) e = e.previousElementSibling;
+    for (; e && !e.matches("h1, h2, h3, h4");) e = e.previousElementSibling;
     return e?.id;
   }
   let paragraphMenuMap = paragraphs.reduce((e, t) => {
@@ -41,9 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
             inline: "nearest",
           });
         }
-        for (; e; ) {
+        for (; e;) {
           e?.classList.add("parent"), (e = e.parentElement.closest("li"));
         }
       }
   }
-});
+};
+
+document.addEventListener("DOMContentLoaded", window.initTOC);
