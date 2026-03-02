@@ -20,9 +20,9 @@ Wawona will be distributed as a native app on each platform:
 
 | Platform | Where to Get It | Status |
 |----------|----------------|--------|
-| **macOS** | Mac App Store | 🔜 Coming Soon |
-| **iOS / iPadOS** | App Store | 🔜 Coming Soon |
-| **Android** | Google Play Store | 🔜 Coming Soon |
+| **macOS** | Mac App Store | Coming Soon |
+| **iOS / iPadOS** | App Store | Coming Soon |
+| **Android** | Google Play Store | Coming Soon |
 
 Once available, simply download and install — no terminal, no build tools, no Nix. Just a regular app.
 
@@ -32,7 +32,7 @@ Once available, simply download and install — no terminal, no build tools, no 
 
 Wawona is in active development (v0.2.x) and **not yet available on public app stores**. Here's how you can get involved right now:
 
-#### 🧪 Join the iOS TestFlight Beta
+#### Join the iOS TestFlight Beta
 
 We have an active **TestFlight** for iOS beta testing. Join to get early access and help shape Wawona before launch:
 
@@ -40,13 +40,13 @@ We have an active **TestFlight** for iOS beta testing. Join to get early access 
 2. Request access to the TestFlight beta in the `#beta-testing` channel
 3. You'll receive a TestFlight invite link directly to your device
 
-#### 💬 Join the Discord Community
+#### Join the Discord Community
 
 Stay up to date with development progress, ask questions, and share feedback:
 
 👉 **[discord.gg/wHVSV52uw5](https://discord.gg/wHVSV52uw5)**
 
-#### ⭐ Star the Repository
+#### Star the Repository
 
 Follow development on GitHub to get notified of new releases:
 

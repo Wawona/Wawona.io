@@ -78,7 +78,7 @@ page_template = "page.html"
 
 Wawona is a native Wayland compositor for macOS, iOS, and Android. Choose a section below to get started.
 
-<h3 class="docs-section-title">🚀 Getting Started</h3>
+<h3 class="docs-section-title">Getting Started</h3>
 <div class="docs-grid">
 <a href="/docs/getting-started/">
 <strong>Getting Started</strong>
@@ -94,7 +94,7 @@ Wawona is a native Wayland compositor for macOS, iOS, and Android. Choose a sect
 </a>
 </div>
 
-<h3 class="docs-section-title">🏗️ Architecture & Design</h3>
+<h3 class="docs-section-title">Architecture & Design</h3>
 <div class="docs-grid">
 <a href="/docs/architecture/">
 <strong>Architecture</strong>
@@ -110,7 +110,7 @@ Wawona is a native Wayland compositor for macOS, iOS, and Android. Choose a sect
 </a>
 </div>
 
-<h3 class="docs-section-title">⚙️ Configuration & Features</h3>
+<h3 class="docs-section-title">Configuration & Features</h3>
 <div class="docs-grid">
 <a href="/docs/settings/">
 <strong>Settings Reference</strong>
@@ -126,7 +126,7 @@ Wawona is a native Wayland compositor for macOS, iOS, and Android. Choose a sect
 </a>
 </div>
 
-<h3 class="docs-section-title">📖 Reference</h3>
+<h3 class="docs-section-title">Reference</h3>
 <div class="docs-grid">
 <a href="/docs/protocols/">
 <strong>Protocol Support</strong>

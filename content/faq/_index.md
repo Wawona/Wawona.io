@@ -142,7 +142,7 @@ template = "faq_section.html"
 
 <p class="faq-intro">Common questions about building, running, and developing with Wawona.</p>
 
-<h3 class="faq-category">🔨 Building & Installation</h3>
+<h3 class="faq-category"> Building & Installation</h3>
 
 <details id="nix-build-time">
 <summary>
@@ -299,7 +299,7 @@ We're working on it! Pre-built binaries are planned but not available yet. Here'
 </div>
 </details>
 
-<h3 class="faq-category">🖥️ Using Wawona</h3>
+<h3 class="faq-category"> Using Wawona</h3>
 
 <details id="port-linux-software">
 <summary>
@@ -361,9 +361,9 @@ Wawona registers **68 Wayland protocol globals**, but not all are fully implemen
 
 | Status | Count | Meaning |
 |--------|-------|---------|
-| 🟢 Functional | ~10 | Full request handling, state management, events |
-| 🟡 Partial | ~8 | Some requests work, others are incomplete |
-| 🔴 Stub | ~49 | Registered but handlers only log — no state changes |
+| ✓ Functional | ~10 | Full request handling, state management, events |
+| ~ Partial | ~8 | Some requests work, others are incomplete |
+| – Stub | ~49 | Registered but handlers only log — no state changes |
 
 **Fully functional protocols** include: `wl_compositor`, `wl_shm`, `wl_output`, `xdg_wm_base`, and `zxdg_decoration_manager_v1`.
 
@@ -387,7 +387,7 @@ Currently, Wawona targets **Apple Silicon (M1, M2, M3, M4)** only. Intel Mac sup
 </div>
 </details>
 
-<h3 class="faq-category">🛠️ Development</h3>
+<h3 class="faq-category"> Development</h3>
 
 <details id="ios-signing">
 <summary>
@@ -422,7 +422,7 @@ See the full walkthrough in the [Getting Started — Team ID](/docs/getting-star
 
 Protocol modules live in `src/core/wayland/` and follow a consistent pattern:
 
-1. **Pick a stub protocol** from the [Protocol Support](/docs/protocols/) page (🔴 status)
+1. **Pick a stub protocol** from the [Protocol Support](/docs/protocols/) page (– status)
 2. **Study the spec** at [wayland.app](https://wayland.app/) for the protocol's expected behavior
 3. **Implement handlers** — turn the `tracing::debug!()` stubs into real state mutations and response events
 4. **Test** with a known client that uses that protocol (e.g., `foot` for `zwp_text_input_manager_v3`)
