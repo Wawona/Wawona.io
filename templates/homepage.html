@@ -1,0 +1,946 @@
+{% extends "base.html" %}
+
+{% macro home_page(section) %}
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1: HERO
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-hero">
+    <div class="lp-hero-bg"></div>
+    <div class="lp-hero-content">
+        <h1 class="lp-hero-title">Wawona</h1>
+        <p class="lp-hero-tagline">A native, high-performance Wayland compositor for <strong>macOS</strong>, <strong>iOS</strong>, and <strong>Android</strong>.</p>
+        <p class="lp-hero-sub">Powered by a shared Rust core with direct Metal &amp; Vulkan rendering. Zero-copy. Bare-metal speed. No VMs.</p>
+        <div class="lp-hero-actions">
+            <a href="/docs/getting-started/" class="lp-btn lp-btn-primary">Get Started</a>
+            <a href="https://github.com/aspauldingcode/Wawona" target="_blank" rel="noopener" class="lp-btn lp-btn-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View Source
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2: FEATURE CARDS
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section">
+    <h2 class="lp-section-title">Why Wawona?</h2>
+    <p class="lp-section-sub">A compositor built from the ground up for the platforms you actually use.</p>
+    <div class="lp-features">
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">🖥️</div>
+            <h3>Native Compositing</h3>
+            <p>Sits underneath <strong>Quartz</strong> on macOS, <strong>UIKit</strong> on iOS, and <strong>Android's WindowManager</strong>. Wayland surfaces become first-class native windows.</p>
+        </div>
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">⚡</div>
+            <h3>Bare-Metal Rendering</h3>
+            <p>Direct <strong>Metal (Liquid Glass)</strong> and <strong>Vulkan</strong> pipelines with zero-copy <strong>IOSurface</strong> integration for near-instant frame delivery.</p>
+        </div>
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">🦀</div>
+            <h3>Rust Core</h3>
+            <p><strong>186+ crates</strong> managing compositor state, protocol dispatch, and surface management with memory safety. Cross-platform via <strong>UniFFI</strong> bindings.</p>
+        </div>
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">🌐</div>
+            <h3>68 Wayland Protocols</h3>
+            <p>Registers <strong>68 protocol globals</strong> including wl_compositor, xdg_wm_base, and wlr extensions. Growing implementation coverage every release.</p>
+        </div>
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">🔧</div>
+            <h3>Nix-Powered Builds</h3>
+            <p>Hermetic, reproducible builds that cross-compile <strong>27 native C/C++ libraries</strong> from source for macOS, iOS, and Android. Nix is your only dependency.</p>
+        </div>
+        <div class="lp-feature-card">
+            <div class="lp-feature-icon">📡</div>
+            <h3>Waypipe Integration</h3>
+            <p>Run remote Linux GUI apps over SSH and display them natively on your device. Built-in <strong>Waypipe + Dropbear SSH</strong> on mobile platforms.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3: SCREENSHOT SHOWCASE
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section lp-showcase-section">
+    <h2 class="lp-section-title">See It in Action</h2>
+    <p class="lp-section-sub">Run full Linux desktop environments natively inside Wawona on macOS.</p>
+    <div class="lp-showcase">
+        <div class="lp-showcase-track" id="showcaseTrack">
+            <div class="lp-showcase-slide active">
+                <img src="/images/wawona-screenshots/wawona_nested_plasma.png" alt="KDE Plasma nested in Wawona" loading="lazy" />
+                <span class="lp-showcase-caption">KDE Plasma running nested inside Wawona</span>
+            </div>
+            <div class="lp-showcase-slide">
+                <img src="/images/wawona-screenshots/wawona_nested_xfce.png" alt="XFCE nested in Wawona" loading="lazy" />
+                <span class="lp-showcase-caption">XFCE desktop composited natively on macOS</span>
+            </div>
+            <div class="lp-showcase-slide">
+                <img src="/images/wawona-screenshots/wawona_nested_cosmic.png" alt="COSMIC nested in Wawona" loading="lazy" />
+                <span class="lp-showcase-caption">System76 COSMIC running through Wawona</span>
+            </div>
+            <div class="lp-showcase-slide">
+                <img src="/images/wawona-screenshots/wawona-screenshot-1.png" alt="Wawona native compositing" loading="lazy" />
+                <span class="lp-showcase-caption">Native Wayland compositing on macOS</span>
+            </div>
+        </div>
+        <div class="lp-showcase-dots" id="showcaseDots">
+            <button class="lp-dot active" data-index="0"></button>
+            <button class="lp-dot" data-index="1"></button>
+            <button class="lp-dot" data-index="2"></button>
+            <button class="lp-dot" data-index="3"></button>
+        </div>
+    </div>
+    <div class="lp-showcase-cta">
+        <a href="/gallery/" class="lp-btn lp-btn-outline">View Full Gallery →</a>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4: ARCHITECTURE DIAGRAM
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section">
+    <h2 class="lp-section-title">Architecture</h2>
+    <p class="lp-section-sub">One shared Rust core. Three native frontends. Zero compromise.</p>
+    <div class="lp-arch">
+        <div class="lp-arch-layer lp-arch-top">
+            <div class="lp-arch-node lp-arch-macos">
+                <span class="lp-arch-label">macOS</span>
+                <span class="lp-arch-detail">Metal · Quartz · AppKit</span>
+            </div>
+            <div class="lp-arch-node lp-arch-ios">
+                <span class="lp-arch-label">iOS</span>
+                <span class="lp-arch-detail">Metal · UIKit · SwiftUI</span>
+            </div>
+            <div class="lp-arch-node lp-arch-android">
+                <span class="lp-arch-label">Android</span>
+                <span class="lp-arch-detail">Vulkan · JNI · Kotlin</span>
+            </div>
+        </div>
+        <div class="lp-arch-connector">
+            <div class="lp-arch-line"></div>
+            <span class="lp-arch-connector-label">UniFFI · C FFI</span>
+            <div class="lp-arch-line"></div>
+        </div>
+        <div class="lp-arch-layer lp-arch-bottom">
+            <div class="lp-arch-node lp-arch-core">
+                <span class="lp-arch-label">🦀 Rust Core</span>
+                <span class="lp-arch-detail">Wayland Server · Compositor State · Surface Management · IPC · Protocol Dispatch</span>
+            </div>
+        </div>
+        <div class="lp-arch-connector">
+            <div class="lp-arch-line"></div>
+            <span class="lp-arch-connector-label">wayland-server · wayland-protocols</span>
+            <div class="lp-arch-line"></div>
+        </div>
+        <div class="lp-arch-layer lp-arch-bottom">
+            <div class="lp-arch-node lp-arch-deps">
+                <span class="lp-arch-label">Native Dependencies</span>
+                <span class="lp-arch-detail">libwayland · xkbcommon · FFmpeg · OpenSSL · Weston · MoltenVK · ANGLE · 20+ more</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 5: QUICK LINKS
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section">
+    <h2 class="lp-section-title">Explore</h2>
+    <div class="lp-quicklinks">
+        <a href="/docs/" class="lp-quicklink">
+            <div class="lp-quicklink-icon">📖</div>
+            <h3>Documentation</h3>
+            <p>Build guides, architecture deep-dives, and configuration references.</p>
+        </a>
+        <a href="/faq/" class="lp-quicklink">
+            <div class="lp-quicklink-icon">❓</div>
+            <h3>FAQ</h3>
+            <p>Build times, storage requirements, Nix setup, and porting Linux software.</p>
+        </a>
+        <a href="/gallery/" class="lp-quicklink">
+            <div class="lp-quicklink-icon">🖼️</div>
+            <h3>Gallery</h3>
+            <p>Screenshots of Linux desktops running natively inside Wawona.</p>
+        </a>
+        <a href="/download/" class="lp-quicklink">
+            <div class="lp-quicklink-icon">⬇️</div>
+            <h3>Download</h3>
+            <p>Get Wawona and start compositing Wayland clients on your device.</p>
+        </a>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 6: RECENT POSTS + RELEASES
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section">
+    <div class="home-grid">
+        <!-- Recent Posts -->
+        <div class="home-card">
+            <div class="home-card-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9" />
+                    <path
+                        d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />
+                </svg>
+                <h2>Recent Posts</h2>
+            </div>
+            <div class="home-card-body">
+                {% set posts_section = get_section(path="posts/_index.md") %}
+                {% for page in posts_section.pages | slice(end=3) %}
+                <a href="{{ page.permalink | safe }}" class="home-list-item">
+                    <div class="home-list-meta">
+                        <time>{{ page.date | date(format="%b %d, %Y") }}</time>
+                    </div>
+                    <h3>{{ page.title }}</h3>
+                    {% if page.description %}
+                    <p>{{ page.description }}</p>
+                    {% elif page.summary %}
+                    <p>{{ page.summary | striptags | truncate(length=120) }}</p>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+            <div class="home-card-footer">
+                <a href="{{ get_url(path='posts') }}" class="home-card-link">View all posts →</a>
+            </div>
+        </div>
+
+        <!-- Latest Releases -->
+        <div class="home-card">
+            <div class="home-card-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4" />
+                    <path d="m15.2 7.4.8-.8 2.8 2.8-.8.8" />
+                    <path d="M12 10a4 4 0 1 0 0 8" />
+                    <path d="M12 18v4" />
+                    <circle cx="12" cy="14" r="1" />
+                </svg>
+                <h2>Latest Releases</h2>
+            </div>
+            <div class="home-card-body" id="releases-list">
+                <div class="releases-loading">
+                    <div class="loading-spinner"></div>
+                    <span>Loading releases...</span>
+                </div>
+            </div>
+            <div class="home-card-footer">
+                <a href="https://github.com/Wawona/Wawona/releases" target="_blank" rel="noopener"
+                    class="home-card-link">View all releases →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 7: COMMUNITY CTA
+     ═══════════════════════════════════════════════════ -->
+<section class="lp-section lp-community">
+    <h2 class="lp-section-title">Join the Community</h2>
+    <p class="lp-section-sub">Wawona is a student-funded, open-source project. Your support makes it possible.</p>
+    <div class="lp-community-links">
+        <a href="https://discord.gg/wHVSV52uw5" target="_blank" rel="noopener" class="lp-community-card">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/></svg>
+            <h3>Discord</h3>
+            <p>Chat with contributors and get help</p>
+        </a>
+        <a href="https://ko-fi.com/aspauldingcode" target="_blank" rel="noopener" class="lp-community-card">
+            <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi" width="28" height="28" style="filter: none;" />
+            <h3>Support on Ko-fi</h3>
+            <p>Help fund ongoing development</p>
+        </a>
+        <a href="https://github.com/aspauldingcode/Wawona" target="_blank" rel="noopener" class="lp-community-card">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            <h3>GitHub</h3>
+            <p>Star, fork, and contribute</p>
+        </a>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════════ -->
+<script>
+    // Releases fetcher (preserved from original)
+    async function fetchReleases() {
+        const container = document.getElementById('releases-list');
+        if (!container) return;
+        try {
+            const res = await fetch('https://api.github.com/repos/Wawona/Wawona/releases?per_page=3');
+            if (!res.ok) throw new Error('GitHub API error');
+            const releases = await res.json();
+            if (releases.length === 0) {
+                container.innerHTML = '<p class="releases-empty">No releases yet.</p>';
+                return;
+            }
+            container.innerHTML = releases.map(release => {
+                const name = release.name || release.tag_name;
+                const date = new Date(release.published_at).toLocaleDateString('en-US', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                });
+                let summary = '';
+                if (release.body) {
+                    const lines = release.body.split('\n')
+                        .map(l => l.replace(/^#+\s*/, '').replace(/\r/g, '').trim())
+                        .filter(l => l && !l.startsWith('[') && !l.startsWith('---'));
+                    const meaningful = lines.find(l => l.length > 20 && !l.startsWith('#'));
+                    summary = meaningful ? meaningful.substring(0, 140) + (meaningful.length > 140 ? '…' : '') : '';
+                }
+                return `
+                    <a href="${release.html_url}" target="_blank" rel="noopener" class="home-list-item">
+                        <div class="home-list-meta">
+                            <time>${date}</time>
+                            <span class="release-tag">${release.tag_name}</span>
+                        </div>
+                        <h3>${name}</h3>
+                        ${summary ? `<p>${summary}</p>` : ''}
+                    </a>
+                `;
+            }).join('');
+        } catch (e) {
+            container.innerHTML = `
+                <div class="releases-error">
+                    <p>Could not load releases.</p>
+                    <a href="https://github.com/Wawona/Wawona/releases" target="_blank" rel="noopener">View on GitHub →</a>
+                </div>
+            `;
+        }
+    }
+
+    // Screenshot carousel
+    function initShowcase() {
+        const track = document.getElementById('showcaseTrack');
+        const dots = document.querySelectorAll('.lp-dot');
+        if (!track || !dots.length) return;
+
+        let current = 0;
+        const slides = track.querySelectorAll('.lp-showcase-slide');
+        const total = slides.length;
+
+        function goTo(i) {
+            slides[current].classList.remove('active');
+            dots[current].classList.remove('active');
+            current = i;
+            slides[current].classList.add('active');
+            dots[current].classList.add('active');
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => goTo(parseInt(dot.dataset.index)));
+        });
+
+        // Auto-advance every 5 seconds
+        setInterval(() => goTo((current + 1) % total), 5000);
+    }
+
+    // Scroll-reveal animation
+    function initScrollReveal() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('lp-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.lp-section, .lp-feature-card, .lp-quicklink, .lp-community-card').forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => { fetchReleases(); initShowcase(); initScrollReveal(); });
+    } else {
+        fetchReleases(); initShowcase(); initScrollReveal();
+    }
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     STYLES
+     ═══════════════════════════════════════════════════ -->
+<style>
+    /* ---- Scroll Reveal ---- */
+    .lp-section,
+    .lp-feature-card,
+    .lp-quicklink,
+    .lp-community-card {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .lp-visible {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+    .lp-feature-card:nth-child(2) { transition-delay: 0.1s; }
+    .lp-feature-card:nth-child(3) { transition-delay: 0.2s; }
+    .lp-feature-card:nth-child(4) { transition-delay: 0.3s; }
+    .lp-feature-card:nth-child(5) { transition-delay: 0.4s; }
+    .lp-feature-card:nth-child(6) { transition-delay: 0.5s; }
+
+    /* ---- Hero ---- */
+    .lp-hero {
+        position: relative;
+        text-align: center;
+        padding: 5rem 1.5rem 4rem;
+        overflow: hidden;
+    }
+    .lp-hero-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 50% 0%, var(--primary-color) 0%, transparent 70%);
+        opacity: 0.08;
+        pointer-events: none;
+    }
+    .lp-hero-content {
+        position: relative;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+    .lp-hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        font-family: var(--header-font);
+        letter-spacing: -0.03em;
+        margin: 0 0 1rem;
+        background: linear-gradient(135deg, var(--text-0), var(--primary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .lp-hero-tagline {
+        font-size: 1.25rem;
+        color: var(--text-0);
+        margin: 0 0 0.75rem;
+        line-height: 1.5;
+        font-family: var(--text-font);
+    }
+    .lp-hero-tagline strong {
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+    .lp-hero-sub {
+        font-size: 1rem;
+        color: var(--text-2);
+        margin: 0 0 2rem;
+        line-height: 1.6;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .lp-hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* ---- Buttons ---- */
+    .lp-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.75rem;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        font-family: var(--text-font);
+    }
+    .lp-btn-primary {
+        background: var(--primary-color);
+        color: var(--hover-color) !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    .lp-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        filter: brightness(1.1);
+        background: var(--primary-color) !important;
+        color: var(--hover-color) !important;
+    }
+    .lp-btn-secondary {
+        background: var(--bg-1);
+        color: var(--text-0) !important;
+        border: 1px solid var(--border-color);
+    }
+    .lp-btn-secondary:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color) !important;
+        background: var(--bg-1) !important;
+        transform: translateY(-2px);
+    }
+    .lp-btn-outline {
+        background: transparent;
+        color: var(--primary-color) !important;
+        border: 1px solid var(--primary-color);
+    }
+    .lp-btn-outline:hover {
+        background: var(--primary-color) !important;
+        color: var(--hover-color) !important;
+        transform: translateY(-2px);
+    }
+
+    /* ---- Sections ---- */
+    .lp-section {
+        padding: 4rem 1.5rem;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+    .lp-section-title {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 800;
+        font-family: var(--header-font);
+        letter-spacing: -0.02em;
+        margin: 0 0 0.5rem;
+    }
+    .lp-section-sub {
+        text-align: center;
+        font-size: 1.05rem;
+        color: var(--text-2);
+        margin: 0 0 2.5rem;
+        max-width: 560px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.5;
+    }
+
+    /* ---- Feature Cards ---- */
+    .lp-features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+    }
+    .lp-feature-card {
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 1.75rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .lp-feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-color), transparent);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .lp-feature-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-4px);
+    }
+    :root.dark .lp-feature-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    :root.light .lp-feature-card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+    .lp-feature-card:hover::before { opacity: 1; }
+    .lp-feature-icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .lp-feature-card h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-family: var(--header-font);
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.01em;
+    }
+    .lp-feature-card p {
+        font-size: 0.88rem;
+        color: var(--text-2);
+        line-height: 1.55;
+        margin: 0;
+    }
+    .lp-feature-card p strong {
+        color: var(--text-0);
+    }
+
+    /* ---- Screenshot Showcase ---- */
+    .lp-showcase-section { max-width: 1060px; }
+    .lp-showcase {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+    }
+    .lp-showcase-track { position: relative; }
+    .lp-showcase-slide {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+    }
+    .lp-showcase-slide.active {
+        display: flex;
+        animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .lp-showcase-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .lp-showcase-caption {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.85rem;
+        color: var(--text-2);
+        text-align: center;
+        font-style: italic;
+    }
+    .lp-showcase-dots {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.75rem 0 1rem;
+    }
+    .lp-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid var(--text-2);
+        background: transparent;
+        cursor: pointer;
+        padding: 0;
+        transition: all 0.2s ease;
+    }
+    .lp-dot.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        transform: scale(1.2);
+    }
+    .lp-dot:hover:not(.active) {
+        border-color: var(--text-0);
+    }
+    .lp-showcase-cta {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    /* ---- Architecture ---- */
+    .lp-arch {
+        max-width: 720px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    .lp-arch-layer {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    .lp-arch-node {
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+        flex: 1;
+        transition: all 0.3s ease;
+        max-width: 220px;
+    }
+    .lp-arch-node:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+    :root.dark .lp-arch-node:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    :root.light .lp-arch-node:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .lp-arch-core, .lp-arch-deps {
+        max-width: 100%;
+        flex: unset;
+        width: 100%;
+        background: linear-gradient(135deg, var(--bg-1), var(--bg-0));
+    }
+    .lp-arch-core {
+        border: 2px solid var(--primary-color);
+    }
+    .lp-arch-label {
+        display: block;
+        font-weight: 700;
+        font-size: 1rem;
+        font-family: var(--header-font);
+        margin-bottom: 0.25rem;
+    }
+    .lp-arch-detail {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--text-2);
+        line-height: 1.4;
+    }
+    .lp-arch-connector {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        justify-content: center;
+    }
+    .lp-arch-line {
+        width: 40px;
+        height: 2px;
+        background: var(--border-color);
+    }
+    .lp-arch-connector-label {
+        font-size: 0.72rem;
+        color: var(--text-2);
+        font-family: var(--mono-text-font);
+        white-space: nowrap;
+    }
+
+    /* ---- Quick Links ---- */
+    .lp-quicklinks {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+    .lp-quicklink {
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        text-align: center;
+        border-bottom: none !important;
+    }
+    .lp-quicklink:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-4px);
+        color: inherit !important;
+        background: var(--bg-1) !important;
+    }
+    :root.dark .lp-quicklink:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    :root.light .lp-quicklink:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .lp-quicklink-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .lp-quicklink h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-family: var(--header-font);
+        margin: 0 0 0.4rem;
+    }
+    .lp-quicklink p {
+        font-size: 0.82rem;
+        color: var(--text-2);
+        margin: 0;
+        line-height: 1.45;
+    }
+
+    /* ---- Community ---- */
+    .lp-community {
+        text-align: center;
+        padding-bottom: 5rem;
+    }
+    .lp-community-links {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.25rem;
+        max-width: 720px;
+        margin: 0 auto;
+    }
+    .lp-community-card {
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 1.75rem 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: none !important;
+    }
+    .lp-community-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-4px);
+        color: inherit !important;
+        background: var(--bg-1) !important;
+    }
+    :root.dark .lp-community-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    :root.light .lp-community-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .lp-community-card svg, .lp-community-card img {
+        color: var(--primary-color);
+    }
+    .lp-community-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        font-family: var(--header-font);
+        margin: 0;
+    }
+    .lp-community-card p {
+        font-size: 0.82rem;
+        color: var(--text-2);
+        margin: 0;
+    }
+
+    /* ---- Preserved from existing homepage ---- */
+    .home-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    .home-card {
+        background-color: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .home-card:hover { border-color: var(--primary-color); }
+    :root.dark .home-card { box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+    :root.dark .home-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.5); }
+    :root.light .home-card { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    :root.light .home-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .home-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .home-card-header svg { color: var(--primary-color); flex-shrink: 0; }
+    .home-card-header h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        font-family: var(--header-font);
+        letter-spacing: -0.01em;
+    }
+    .home-card-body { flex: 1; padding: 0.5rem 0; }
+    .home-card-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+    .home-card-link {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary-color) !important;
+        text-decoration: none;
+        border-bottom: none !important;
+    }
+    .home-card-link:hover { background-color: transparent !important; opacity: 0.8; }
+    .home-list-item {
+        display: block;
+        padding: 1rem 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        border-bottom: none !important;
+        transition: background-color 0.2s ease;
+    }
+    .home-list-item:hover { background-color: var(--bg-2) !important; color: inherit !important; }
+    .home-list-item + .home-list-item { border-top: 1px solid var(--border-color); }
+    .home-list-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.3rem;
+    }
+    .home-list-meta time {
+        font-size: 0.75rem;
+        font-family: var(--mono-text-font);
+        color: var(--text-2);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .release-tag {
+        font-size: 0.7rem;
+        font-family: var(--mono-text-font);
+        font-weight: 600;
+        color: var(--primary-color);
+        background-color: var(--bg-0);
+        padding: 0.1rem 0.45rem;
+        border-radius: 4px;
+        border: 1px solid var(--border-color);
+    }
+    .home-list-item h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        font-family: var(--header-font);
+        line-height: 1.3;
+    }
+    .home-list-item p {
+        margin: 0;
+        font-size: 0.82rem;
+        color: var(--text-2);
+        line-height: 1.45;
+    }
+    .releases-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        padding: 2.5rem 1.5rem;
+        color: var(--text-2);
+        font-size: 0.85rem;
+    }
+    .loading-spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--border-color);
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .releases-empty, .releases-error {
+        padding: 2rem 1.5rem;
+        text-align: center;
+        color: var(--text-2);
+        font-size: 0.85rem;
+    }
+    .releases-error a {
+        display: inline-block;
+        margin-top: 0.5rem;
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 1024px) {
+        .lp-features { grid-template-columns: repeat(2, 1fr); }
+        .lp-quicklinks { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+        .lp-hero { padding: 3rem 1.25rem 2.5rem; }
+        .lp-hero-title { font-size: 2.5rem; }
+        .lp-hero-tagline { font-size: 1.1rem; }
+        .lp-features { grid-template-columns: 1fr; }
+        .lp-quicklinks { grid-template-columns: 1fr 1fr; }
+        .lp-community-links { grid-template-columns: 1fr; }
+        .home-grid { grid-template-columns: 1fr; }
+        .lp-section { padding: 3rem 1.25rem; }
+        .lp-arch-layer.lp-arch-top { flex-direction: column; align-items: center; }
+        .lp-arch-node { max-width: 100%; }
+    }
+    @media (max-width: 480px) {
+        .lp-quicklinks { grid-template-columns: 1fr; }
+        .lp-hero-title { font-size: 2rem; }
+    }
+</style>
+{% endmacro home_page %}
+
+{% block main_content %}
+{{ self::home_page(section=section) }}
+{% endblock main_content %}
