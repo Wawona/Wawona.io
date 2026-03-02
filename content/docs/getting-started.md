@@ -12,48 +12,53 @@ Wawona is a native Wayland compositor for **macOS**, **iOS**, and **Android**. W
 
 ## For Users
 
-### What You Need
+> **You do NOT need to install Nix.** Nix is a developer tool for building Wawona from source. If you just want to *use* Wawona, read this section instead.
 
-- An **Apple Silicon Mac** (M1 or later)
-- **Nix** package manager with flakes enabled
+### The Easy Way: App Store & Play Store
 
-### Install Nix
+Wawona will be distributed as a native app on each platform:
 
-We recommend [**Determinate Nix**](https://determinate.systems/nix-installer/) — it enables flakes out of the box, so there's no extra configuration:
+| Platform | Where to Get It | Status |
+|----------|----------------|--------|
+| **macOS** | Mac App Store | 🔜 Coming Soon |
+| **iOS / iPadOS** | App Store | 🔜 Coming Soon |
+| **Android** | Google Play Store | 🔜 Coming Soon |
 
-```bash
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-```
+Once available, simply download and install — no terminal, no build tools, no Nix. Just a regular app.
 
-### Run Wawona
+> **Visit the [Downloads](/download/) page** for the latest availability info.
 
-Clone the repository and run:
+### While We're Still in Development…
 
-```bash
-git clone https://github.com/aspauldingcode/Wawona
-cd Wawona
-nix run
-```
+Wawona is in active development (v0.2.x) and **not yet available on public app stores**. Here's how you can get involved right now:
 
-That's it — Nix handles all dependencies. The macOS app will build and launch automatically.
+#### 🧪 Join the iOS TestFlight Beta
 
-### Run Wayland Apps
+We have an active **TestFlight** for iOS beta testing. Join to get early access and help shape Wawona before launch:
 
-Once Wawona is running, you can launch Wayland clients:
+1. Join our [Discord server](https://discord.gg/wHVSV52uw5)
+2. Request access to the TestFlight beta in the `#beta-testing` channel
+3. You'll receive a TestFlight invite link directly to your device
 
-```bash
-# Weston terminal (built from source via Nix)
-nix run .#weston-terminal
+#### 💬 Join the Discord Community
 
-# Full Weston compositor (nested inside Wawona)
-nix run .#weston
-```
+Stay up to date with development progress, ask questions, and share feedback:
 
-For remote apps over SSH, see the [Waypipe guide](/docs/waypipe/).
+👉 **[discord.gg/wHVSV52uw5](https://discord.gg/wHVSV52uw5)**
+
+#### ⭐ Star the Repository
+
+Follow development on GitHub to get notified of new releases:
+
+👉 **[github.com/aspauldingcode/Wawona](https://github.com/aspauldingcode/Wawona)**
+
+> **TL;DR:** You do **not** need Nix, Rust, Xcode, or any developer tools. When Wawona ships, it will be a one-click install from the App Store or Play Store. Until then, join the [Discord](https://discord.gg/wHVSV52uw5) and the iOS [TestFlight](https://discord.gg/wHVSV52uw5) beta.
 
 ---
 
 ## For Developers
+
+> Everything below this line is for people who want to **build Wawona from source** or contribute to the project. This requires Nix.
 
 ### Prerequisites
 
