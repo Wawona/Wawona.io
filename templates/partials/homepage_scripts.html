@@ -762,9 +762,8 @@
     /* ===== FEATURES (Horizontal Scrollytelling) ===== */
     .lp-features-scroll-wrapper {
         position: relative;
-        background: var(--bg-1);
-        border-top: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
+        background: transparent;
+        /* No longer has solid background */
     }
 
     .lp-features-sticky {
@@ -780,7 +779,8 @@
 
     .lp-features-header {
         position: absolute;
-        top: 10%;
+        top: 5%;
+        /* Shift higher to clear the Zero-Copy card */
         left: 5%;
         z-index: 10;
         text-align: left;
@@ -794,7 +794,8 @@
     .lp-features-track {
         display: flex;
         width: max-content;
-        height: 65vh;
+        height: max-content;
+        /* Stop stretching 65vh */
         padding-left: 5vw;
         padding-right: 50vw;
         /* Lots of dead space so the last card can align left fully */
@@ -805,7 +806,8 @@
     .lp-feature-card {
         width: 650px;
         min-width: 650px;
-        height: auto;
+        height: max-content;
+        /* Snap rigidly to content height */
         display: flex;
         flex-direction: column;
         gap: 2.25rem;
@@ -1445,35 +1447,57 @@
         }
 
         .lp-hero-title {
-            font-size: 2.2rem;
+            font-size: 2.75rem;
         }
 
-        .lp-section {
-            padding: 3rem 1.25rem;
+        .lp-hero-sub {
+            font-size: .95rem;
+            padding: 0 .5rem;
         }
 
-        .lp-section-header h2 {
-            font-size: 1.8rem;
+        .lp-showcase-wrap {
+            padding: 2.5rem 1.25rem;
         }
 
-        /* Scrollyboard narrow view downgrade */
-        .lp-features-track {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            width: 100%;
-            padding: 2rem 0;
-            overflow: visible;
+        .lp-showcase-frame {
+            border-radius: 10px;
         }
 
         .lp-feature-card {
+            min-width: 85vw;
+            /* Much wider on mobile */
+            width: 85vw;
+            padding: 2rem;
+            scroll-snap-align: center;
+        }
+
+        .lp-features-header {
+            position: relative;
+            /* Restores document flow on mobile */
+            top: 0;
+            left: 0;
+            padding: 2rem 1.25rem 0;
+        }
+
+        .lp-features-header h2 {
+            font-size: 2.25rem;
+        }
+
+        .lp-features-track {
+            display: flex;
+            flex-direction: row;
+            gap: 1.25rem;
             width: 100%;
-            height: auto;
-            min-height: auto;
-            margin: 0;
-            opacity: 1 !important;
-            /* Override GSAP ghosting natively */
+            padding: 2rem 1.25rem;
             transform: scale(1) !important;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .lp-features-track::-webkit-scrollbar {
+            display: none;
         }
 
         .lp-pillars {

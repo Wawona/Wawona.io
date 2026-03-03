@@ -227,7 +227,7 @@ function initHeroWebGL() {
 
     // Setup Renderers (No EffectComposer to preserve perfect Alpha transparency over the DOM)
     function createRenderer(canvas) {
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true, premultipliedAlpha: false });
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x000000, 0); // True transparent background
