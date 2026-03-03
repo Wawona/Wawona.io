@@ -89,104 +89,115 @@ function initHorizontalScroll() {
 
     if (!wrapper || !track || cards.length === 0 || !window.gsap) return;
 
-    cards.forEach((c, i) => {
-        if (i === 0) {
-            gsap.set(c, { opacity: 1, scale: 1, filter: 'blur(0px)' });
-        } else {
-            gsap.set(c, { opacity: 0.15, scale: 0.9, filter: 'blur(4px)' });
-        }
-    });
+    // Use MatchMedia to completely disable horizontal pinned scrollytelling on mobile
+    let mm = gsap.matchMedia();
 
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            trigger: wrapper,
-            start: "top top",
-            // Add an extra 2 screens of scrolling distance to account for our huge deadzones,
-            // so panning between cards still feels 1:1 with track size
-            end: () => `+=${track.scrollWidth + (window.innerHeight * 2)}`,
-            pin: true,
-            scrub: 1.5,
-            snap: {
-                snapTo: "labels",
-                duration: { min: 0.3, max: 0.8 },
-                ease: "power2.inOut",
-                delay: 0.1
-            },
-            invalidateOnRefresh: true
-        }
-    });
-
-    // Start label: deadzone before moving
-    // Huge pause (absorbs 1 full screen of scrolling)
-    tl.addLabel("card0");
-    tl.to({}, { duration: 3.0 });
-
-    for (let i = 1; i < cards.length; i++) {
-        tl.to(track, {
-            x: () => {
-                const cardLeft = cards[i].offsetLeft;
-                // Align to 5vw margin to match the "The Architecture" header perfectly
-                const leftAlignOffset = window.innerWidth * 0.05;
-
-                return -(cardLeft - leftAlignOffset);
-            },
-            ease: "none",
-            duration: 1
-        });
-
-        // Exact left-aligned label
-        tl.addLabel(`card${i}`);
-
-        // Pause at label to hold focus over scroll
-        if (i === cards.length - 1) {
-            // Huge pause for the very last card (absorbs 1 full screen of scrolling)
-            tl.to({}, { duration: 3.0 });
-        } else {
-            // Tiny pause to help snapping between middle cards
-            tl.to({}, { duration: 0.35 });
-        }
-    }
-
-    // Dynamic fade-in/out scale depending on closest card perfectly aligned with scroll tracking
-    tl.eventCallback("onUpdate", () => {
-
-        let closestIndex = 0;
-        let minDistance = Infinity;
-
-        // trackX represents raw horizontal movement distance backwards. e.g. 0 to -3000px
-        const currentScrollX = gsap.getProperty(track, "x") || 0;
-
-        cards.forEach((card, i) => {
-            // Evaluates mathematical perfect alignment of this card matching 5vw padding left
-            const perfectAlignScrollX = -(card.offsetLeft - (window.innerWidth * 0.05));
-
-            // Distance from where we are currently scrubbed vs where we need to be to center this card
-            let scrubDistance = currentScrollX - perfectAlignScrollX;
-            let absDistance = Math.abs(scrubDistance);
-
-            // The bias math: If the user hasn't physically reached the card yet (scrubDistance > 0),
-            // manually shrink its distance constraint early, allowing it to mathematically win focus much sooner 
-            // than halfway. (Do not delay unblur).
-            if (scrubDistance > 0) {
-                // Bias of 350px - the card wakes up extremely early!
-                absDistance = Math.max(0, absDistance - 350);
-            }
-
-            if (absDistance < minDistance) {
-                minDistance = absDistance;
-                closestIndex = i;
-            }
-        });
+    mm.add("(min-width: 769px)", () => {
 
         cards.forEach((c, i) => {
-            if (i === closestIndex) {
-                // Active leftmost card: crisp, glowing, full size
-                gsap.to(c, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.4, ease: 'power2.out', overwrite: "auto" });
+            if (i === 0) {
+                gsap.set(c, { opacity: 1, scale: 1 });
             } else {
-                // Inactive cards deeply recede
-                gsap.to(c, { opacity: 0.15, scale: 0.9, filter: 'blur(4px)', duration: 0.4, ease: 'power2.out', overwrite: "auto" });
+                gsap.set(c, { opacity: 0.15, scale: 0.9 });
             }
         });
+
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: wrapper,
+                start: "top top",
+                // Add an extra 2 screens of scrolling distance to account for our huge deadzones,
+                // so panning between cards still feels 1:1 with track size
+                end: () => `+=${track.scrollWidth + (window.innerHeight * 2)}`,
+                pin: true,
+                scrub: 1.5,
+                snap: {
+                    snapTo: "labels",
+                    duration: { min: 0.3, max: 0.8 },
+                    ease: "power2.inOut",
+                    delay: 0.1
+                },
+                invalidateOnRefresh: true
+            }
+        });
+
+        // Start label: deadzone before moving
+        // Huge pause (absorbs 1 full screen of scrolling)
+        tl.addLabel("card0");
+        tl.to({}, { duration: 3.0 });
+
+        for (let i = 1; i < cards.length; i++) {
+            tl.to(track, {
+                x: () => {
+                    const cardLeft = cards[i].offsetLeft;
+                    // Align to 5vw margin to match the "The Architecture" header perfectly
+                    const leftAlignOffset = window.innerWidth * 0.05;
+
+                    return -(cardLeft - leftAlignOffset);
+                },
+                ease: "none",
+                duration: 1
+            });
+
+            // Exact left-aligned label
+            tl.addLabel(`card${i}`);
+
+            // Pause at label to hold focus over scroll
+            if (i === cards.length - 1) {
+                // Huge pause for the very last card (absorbs 1 full screen of scrolling)
+                tl.to({}, { duration: 3.0 });
+            } else {
+                // Tiny pause to help snapping between middle cards
+                tl.to({}, { duration: 0.35 });
+            }
+        }
+
+        // Dynamic fade-in/out scale depending on closest card perfectly aligned with scroll tracking
+        tl.eventCallback("onUpdate", () => {
+
+            let closestIndex = 0;
+            let minDistance = Infinity;
+
+            // trackX represents raw horizontal movement distance backwards. e.g. 0 to -3000px
+            const currentScrollX = gsap.getProperty(track, "x") || 0;
+
+            cards.forEach((card, i) => {
+                // Evaluates mathematical perfect alignment of this card matching 5vw padding left
+                const perfectAlignScrollX = -(card.offsetLeft - (window.innerWidth * 0.05));
+
+                // Distance from where we are currently scrubbed vs where we need to be to center this card
+                let scrubDistance = currentScrollX - perfectAlignScrollX;
+                let absDistance = Math.abs(scrubDistance);
+
+                // The bias math: If the user hasn't physically reached the card yet (scrubDistance > 0),
+                // manually shrink its distance constraint early, allowing it to mathematically win focus much sooner 
+                // than halfway. 
+                if (scrubDistance > 0) {
+                    // Bias of 350px - the card wakes up extremely early!
+                    absDistance = Math.max(0, absDistance - 350);
+                }
+
+                if (absDistance < minDistance) {
+                    minDistance = absDistance;
+                    closestIndex = i;
+                }
+            });
+
+            cards.forEach((c, i) => {
+                if (i === closestIndex) {
+                    // Active leftmost card: crisp, glowing, full size (Removed blur per user request)
+                    gsap.to(c, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
+                } else {
+                    // Inactive cards deeply recede 
+                    gsap.to(c, { opacity: 0.15, scale: 0.9, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
+                }
+            });
+        });
+
+        // Cleanup function for when MatchMedia context is destroyed (mobile sizing)
+        return () => {
+            gsap.set(cards, { clearProps: "all" });
+        };
     });
 }
 
@@ -301,6 +312,32 @@ function initHeroWebGL() {
         depthWrite: false
     });
 
+    // Custom shader injection for HDR depth brightness
+    material.onBeforeCompile = (shader) => {
+        shader.vertexShader = `
+            varying float vDepth;
+        ` + shader.vertexShader;
+
+        shader.vertexShader = shader.vertexShader.replace(
+            `#include <project_vertex>`,
+            `#include <project_vertex>
+             vDepth = - mvPosition.z;`
+        );
+
+        shader.fragmentShader = `
+            varying float vDepth;
+        ` + shader.fragmentShader;
+
+        shader.fragmentShader = shader.fragmentShader.replace(
+            `#include <color_fragment>`,
+            `#include <color_fragment>
+             // HDR distance multiplier: particles closer than 1000 units glow vastly brighter
+             float intensity = 1.0 + max(0.0, (1100.0 - vDepth) / 200.0);
+             diffuseColor.rgb *= intensity;
+            `
+        );
+    };
+
     const particleSystem = new THREE.Points(geometry, material);
     scene.add(particleSystem);
 
@@ -381,15 +418,10 @@ function initHeroWebGL() {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 const dark = isDarkTheme();
-
-                // Animate global material tint color
-                gsap.to(material.color, {
-                    r: dark ? baseColorWhite.r : lightColorTint.r,
-                    g: dark ? baseColorWhite.g : lightColorTint.g,
-                    b: dark ? baseColorWhite.b : lightColorTint.b,
-                    duration: 1.2,
-                    ease: "power2.inOut"
-                });
+                // Instantly snap the color. The 'document.startViewTransition' DOM snapshot
+                // captures this precise instant, allowing the native CSS ripple to seamlessly 
+                // reveal the brand new WebGL colors without any manual GSAP crossfading.
+                material.color.copy(dark ? baseColorWhite : lightColorTint);
             }
         });
     });
