@@ -1023,67 +1023,84 @@
     .lp-explore {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
+        gap: 1.25rem;
     }
 
     .lp-explore-card {
-        background: var(--bg-1);
+        background: rgba(var(--bg-1-rgb, 25, 25, 30), 0.65);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
-        border-radius: 12px;
-        padding: 1.5rem;
+        border-radius: 14px;
+        padding: 1.75rem;
         text-decoration: none;
         color: inherit;
-        transition: all .25s cubic-bezier(.16, 1, .3, 1);
+        transition: all .3s cubic-bezier(.16, 1, .3, 1);
         display: flex;
         flex-direction: column;
         border-bottom: none !important;
         will-change: transform;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.06), 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Fallback for native backdrop-filter support */
+    @supports not (backdrop-filter: blur(24px)) {
+        .lp-explore-card {
+            background: var(--bg-1);
+        }
     }
 
     .lp-explore-card:hover {
         border-color: var(--primary-color);
-        transform: translateY(-4px) !important;
+        transform: translateY(-6px) !important;
         color: inherit !important;
-        background: var(--bg-1) !important;
+        background: rgba(var(--bg-1-rgb, 35, 35, 45), 0.85) !important;
     }
 
     :root.dark .lp-explore-card:hover {
-        box-shadow: 0 12px 40px rgba(0, 0, 0, .4);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.2);
     }
 
     :root.light .lp-explore-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 12px 32px rgba(0, 0, 0, 0.1), 0 0 15px rgba(0, 0, 0, 0.05);
     }
 
     .lp-explore-card svg {
         color: var(--primary-color);
-        margin-bottom: .75rem;
+        margin-bottom: 1rem;
+        transition: filter .3s ease;
+    }
+
+    .lp-explore-card:hover svg {
+        filter: drop-shadow(0 0 8px var(--primary-color));
     }
 
     .lp-explore-card h3 {
-        font-size: 1rem;
+        font-size: 1.05rem;
         font-weight: 700;
         font-family: var(--header-font);
         margin: 0 0 .35rem;
     }
 
     .lp-explore-card p {
-        font-size: .8rem;
+        font-size: .85rem;
         color: var(--text-2);
-        line-height: 1.5;
+        line-height: 1.6;
         margin: 0;
         flex: 1;
     }
 
     .lp-explore-arrow {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
         color: var(--primary-color);
-        margin-top: .75rem;
-        transition: transform .2s ease;
+        margin-top: 1rem;
+        transition: transform .3s cubic-bezier(.16, 1, .3, 1), opacity .3s ease;
+        opacity: 0.6;
     }
 
     .lp-explore-card:hover .lp-explore-arrow {
-        transform: translateX(4px);
+        transform: translateX(6px);
+        opacity: 1;
     }
 
     /* ===== TWO COL ===== */
@@ -1094,54 +1111,69 @@
     }
 
     .lp-col-card {
-        background: var(--bg-1);
+        background: rgba(var(--bg-1-rgb, 20, 20, 25), 0.6);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
-        border-radius: 12px;
+        border-radius: 14px;
         overflow: hidden;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    @supports not (backdrop-filter: blur(24px)) {
+        .lp-col-card {
+            background: var(--bg-1);
+        }
     }
 
     :root.dark .lp-col-card {
-        box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 12px 32px rgba(0, 0, 0, .4);
     }
 
     :root.light .lp-col-card {
-        box-shadow: 0 2px 12px rgba(0, 0, 0, .05);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 8px 24px rgba(0, 0, 0, .06);
     }
 
     .lp-col-header {
         display: flex;
         align-items: center;
         gap: .5rem;
-        padding: 1rem 1.25rem;
+        padding: 1.25rem 1.5rem;
         border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
     }
 
     .lp-col-header svg {
         color: var(--primary-color);
         flex-shrink: 0;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
     }
 
     .lp-col-header h3 {
-        font-size: .95rem;
-        font-weight: 600;
+        font-size: 1rem;
+        font-weight: 700;
         font-family: var(--header-font);
         margin: 0;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .lp-col-item {
         display: flex;
         align-items: baseline;
-        gap: .75rem;
-        padding: .85rem 1.25rem;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
         text-decoration: none;
         color: inherit;
         border-bottom: none !important;
-        transition: background .15s ease;
+        border-left: 3px solid transparent;
+        transition: all .2s cubic-bezier(.16, 1, .3, 1);
     }
 
     .lp-col-item:hover {
-        background: var(--bg-2) !important;
+        background: rgba(var(--bg-2-rgb, 40, 40, 50), 0.5) !important;
         color: inherit !important;
+        padding-left: 1.85rem;
+        border-left-color: var(--primary-color);
     }
 
     .lp-col-item+.lp-col-item {
@@ -1149,7 +1181,7 @@
     }
 
     .lp-col-item time {
-        font-size: .7rem;
+        font-size: .75rem;
         font-family: var(--mono-text-font);
         color: var(--text-2);
         white-space: nowrap;
@@ -1157,48 +1189,50 @@
     }
 
     .lp-col-item span {
-        font-size: .88rem;
+        font-size: .9rem;
         font-weight: 500;
     }
 
     .lp-col-item code {
-        font-size: .7rem;
+        font-size: .75rem;
         color: var(--primary-color);
         background: var(--bg-0);
-        padding: .1rem .4rem;
-        border-radius: 4px;
+        padding: .15rem .5rem;
+        border-radius: 6px;
         border: 1px solid var(--border-color);
         font-weight: 600;
     }
 
     .lp-col-footer {
         display: block;
-        padding: .85rem 1.25rem;
-        font-size: .8rem;
+        padding: 1rem 1.5rem;
+        font-size: .85rem;
         font-weight: 600;
         color: var(--primary-color) !important;
         text-decoration: none;
         border-top: 1px solid var(--border-color);
         border-bottom: none !important;
+        background: rgba(0, 0, 0, 0.1);
+        transition: background .2s ease;
     }
 
     .lp-col-footer:hover {
-        background: var(--bg-2) !important;
+        background: rgba(var(--primary-color-rgb, 255, 255, 255), 0.05) !important;
     }
 
     .lp-loading {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: .5rem;
-        padding: 2rem;
+        gap: .75rem;
+        padding: 2.5rem;
         color: var(--text-2);
-        font-size: .82rem;
+        font-size: .9rem;
     }
 
     .lp-spinner {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         border: 2px solid var(--border-color);
         border-top-color: var(--primary-color);
         border-radius: 50%;
@@ -1212,10 +1246,10 @@
     }
 
     .lp-empty {
-        padding: 1.5rem;
+        padding: 2rem;
         text-align: center;
         color: var(--text-2);
-        font-size: .82rem;
+        font-size: .9rem;
     }
 
     .lp-empty a {
@@ -1228,7 +1262,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1.5rem;
-        margin-top: 2.5rem;
+        margin-top: 3rem;
     }
 
     .lp-community-block {
@@ -1237,8 +1271,10 @@
         align-items: center;
         text-align: center;
         gap: 1.25rem;
-        padding: 1.75rem;
-        background: var(--bg-1);
+        padding: 2rem;
+        background: rgba(var(--bg-1-rgb, 20, 20, 25), 0.6);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
         border-radius: 16px;
         text-decoration: none;
@@ -1247,44 +1283,54 @@
         position: relative;
         overflow: hidden;
         will-change: transform;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    @supports not (backdrop-filter: blur(24px)) {
+        .lp-community-block {
+            background: var(--bg-1);
+        }
     }
 
     .lp-community-block:hover {
         border-color: var(--primary-color);
-        transform: translateY(-4px);
-        background: var(--bg-1) !important;
+        transform: translateY(-8px);
+        background: rgba(var(--bg-1-rgb, 30, 30, 40), 0.8) !important;
         color: inherit !important;
     }
 
     :root.dark .lp-community-block:hover {
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.2);
     }
 
     :root.light .lp-community-block:hover {
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 16px 40px rgba(0, 0, 0, 0.1), 0 0 20px rgba(0, 0, 0, 0.05);
     }
 
     .lp-community-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
         background: var(--bg-0);
         border: 1px solid var(--border-color);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(.16, 1, .3, 1);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
+    /* Brand Color Lighting Effects on Hover */
     .lp-community-block:hover .lp-community-icon {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        transform: scale(1.1);
+        transform: scale(1.15) translateY(-4px);
+        border-color: currentColor;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), inset 0 0 20px currentColor;
     }
 
     .discord {
         color: #5865F2;
+        /* Raw brand color */
     }
 
     .github {
@@ -1300,16 +1346,16 @@
     }
 
     .lp-community-content h3 {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 700;
         font-family: var(--header-font);
-        margin: 0 0 .25rem;
+        margin: 0 0 .35rem;
     }
 
     .lp-community-content p {
-        font-size: .85rem;
+        font-size: .9rem;
         color: var(--text-2);
-        line-height: 1.5;
+        line-height: 1.6;
         margin: 0;
     }
 
@@ -1408,6 +1454,26 @@
 
         .lp-section-header h2 {
             font-size: 1.8rem;
+        }
+
+        /* Scrollyboard narrow view downgrade */
+        .lp-features-track {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            width: 100%;
+            padding: 2rem 0;
+            overflow: visible;
+        }
+
+        .lp-feature-card {
+            width: 100%;
+            height: auto;
+            min-height: auto;
+            margin: 0;
+            opacity: 1 !important;
+            /* Override GSAP ghosting natively */
+            transform: scale(1) !important;
         }
 
         .lp-pillars {
