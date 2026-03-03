@@ -32,6 +32,77 @@
             {% include "_giscus_script.html" %}
             {% endif %}
         </div>
+
+        <!-- Global Site Footer -->
+        <style>
+            .site-footer {
+                text-align: center;
+                padding: 2.5rem 2rem;
+                border-top: 1px solid var(--border-color);
+                max-width: 960px;
+                margin: 0 auto;
+            }
+
+            .site-footer p {
+                margin: 0;
+                font-size: .85rem;
+                color: var(--text-2);
+            }
+
+            .site-footer a {
+                color: var(--primary-color);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+            @media (hover: hover) {
+                .site-footer a:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            .site-footer-sub {
+                margin-top: .35rem !important;
+                font-size: .75rem !important;
+            }
+
+            .site-footer-source-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: .35rem;
+                padding: .2rem .65rem;
+                border: 1px solid var(--border-color);
+                border-radius: 100px;
+                font-size: .78rem;
+                font-weight: 500;
+                font-family: var(--mono-text-font);
+                color: var(--text-2) !important;
+                text-decoration: none !important;
+                vertical-align: middle;
+                transition: border-color .2s, color .2s;
+                white-space: nowrap;
+            }
+
+            @media (hover: hover) {
+                .site-footer-source-btn:hover {
+                    border-color: var(--primary-color);
+                    color: var(--primary-color) !important;
+                    text-decoration: none !important;
+                }
+            }
+        </style>
+        <footer class="site-footer">
+            <p>Come help <a href="https://aspauldingcode.com" target="_blank" rel="noopener">Alex Spaulding</a> maintain
+                this website! <a href="https://github.com/Wawona/wawona.github.io" target="_blank" rel="noopener"
+                    class="site-footer-source-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"
+                        aria-hidden="true">
+                        <path
+                            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                    </svg> wawona.github.io</a></p>
+            <p class="site-footer-sub">Wawona is free and open-source software under the <a
+                    href="https://github.com/aspauldingcode/Wawona/blob/main/LICENSE" target="_blank" rel="noopener">MIT
+                    License</a>.</p>
+        </footer>
     </div>
 
     <div class="right-content">
@@ -41,7 +112,75 @@
 
     <!-- SPA Router Script -->
     <script>
-        // Mobile hamburger menu toggle (global — works on every page)
+        // ── In-memory SPA page cache ──────────────────────────────────────────
+        // Stores up to _spaCacheMax pages keyed by their canonical URL.
+        // Each entry: { html: string, title: string, scrollY: number }
+        // This means revisiting a page (e.g. Gallery) never re-fetches or
+        // re-renders images — the DOM is restored instantly from the cache.
+        const _spaCache = new Map();
+        const _spaCacheMax = 10;
+
+        function _spaCacheSet(url, html, title) {
+            if (!_spaCache.has(url) && _spaCache.size >= _spaCacheMax) {
+                // LRU eviction: remove oldest entry
+                _spaCache.delete(_spaCache.keys().next().value);
+            }
+            const existing = _spaCache.get(url) || {};
+            _spaCache.set(url, { html, title, scrollY: existing.scrollY || 0 });
+        }
+
+        function _spaCacheSaveScroll(url) {
+            const entry = _spaCache.get(url);
+            if (entry) entry.scrollY = window.scrollY;
+        }
+
+        // ── Active nav-link highlight ──────────────────────────────────────────
+        // Adds .nav-active to the .right-nav link that matches the current route.
+        // Skipped for the homepage ('/') so only real section pages are highlighted.
+        function updateActiveNavLink() {
+            const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+            document.querySelectorAll('.right-nav a').forEach(link => {
+                const linkPath = new URL(link.href).pathname.replace(/\/$/, '') || '/';
+                if (linkPath !== '/' && currentPath.startsWith(linkPath)) {
+                    link.classList.add('nav-active');
+                } else {
+                    link.classList.remove('nav-active');
+                }
+            });
+        }
+
+        // Restore a cached page into #spa-main and re-run all init hooks.
+        function _spaRestoreFromCache(spaMain, entry, url, pushState) {
+            spaMain.innerHTML = entry.html;
+            document.title = entry.title;
+            if (pushState) history.pushState({}, '', url);
+            spaMain.style.opacity = '1';
+            window.scrollTo(0, entry.scrollY || 0);
+            updateActiveNavLink();
+            highlightOnPage();
+            if (window.initCodeBlocks) window.initCodeBlocks();
+            if (window.initTOC) window.initTOC();
+            if (window.initNotes) window.initNotes();
+            if (window.initMermaid) window.initMermaid();
+            if (window.runCinematicSetup) window.runCinematicSetup();
+            const banner = document.getElementById('donationBanner');
+            if (banner && localStorage.getItem('hideDonationBanner') !== 'true') {
+                banner.style.display = 'flex';
+                banner.style.opacity = '1';
+                banner.style.transform = 'translateY(0)';
+            }
+            // Re-execute inline <script> blocks so gallery/lightbox JS re-binds
+            spaMain.querySelectorAll('script').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                // Use an IIFE string to wrap the script content. Concatenation is used
+                // instead of backticks to avoid syntax errors if the script itself contains backticks.
+                newScript.textContent = '(function(){' + oldScript.textContent + '})();';
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
+        // ── Mobile hamburger menu (global — works on every page) ──────────────
         let _menuInterlock = false;
         window.toggleMobileMenu = function () {
             if (_menuInterlock) return;
@@ -51,15 +190,14 @@
             setTimeout(() => { _menuInterlock = false; }, 400);
         };
 
-        // On-page highlighter for search results
+        // ── On-page search highlighter ────────────────────────────────────────
         function highlightOnPage() {
             const params = new URLSearchParams(window.location.search);
             const query = params.get('h');
             if (!query) return;
 
-            // Remove the query param from URL without reloading to keep it clean
-            const newUrl = window.location.pathname + window.location.hash;
-            window.history.replaceState({}, '', newUrl);
+            // Remove the query param from URL without reloading
+            window.history.replaceState({}, '', window.location.pathname + window.location.hash);
 
             const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
             if (words.length === 0) return;
@@ -68,19 +206,13 @@
             const walker = document.createTreeWalker(spaMain, NodeFilter.SHOW_TEXT, null, false);
             const nodes = [];
             let firstMatch = null;
-
             while (walker.nextNode()) nodes.push(walker.currentNode);
 
             nodes.forEach(node => {
                 const text = node.nodeValue;
                 const lowerText = text.toLowerCase();
                 let hasMatch = false;
-
-                // Simple version: check if any word matches
-                words.forEach(word => {
-                    if (lowerText.includes(word)) hasMatch = true;
-                });
-
+                words.forEach(word => { if (lowerText.includes(word)) hasMatch = true; });
                 if (hasMatch) {
                     const span = document.createElement('span');
                     let newHtml = text;
@@ -93,12 +225,10 @@
                     node.parentNode.replaceChild(span, node);
                 }
             });
-
-            if (firstMatch) {
-                firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            if (firstMatch) firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
+        // ── SPA click handler ─────────────────────────────────────────────────
         document.addEventListener('click', async (e) => {
             const link = e.target.closest('a');
             if (
@@ -110,20 +240,28 @@
                 link.getAttribute('href') === '#' ||
                 link.hasAttribute('onclick') ||
                 e.ctrlKey || e.metaKey || e.shiftKey
-            ) {
-                return;
-            }
+            ) return;
 
             e.preventDefault();
             const url = link.href;
 
-            // Close the mobile menu automatically if it's open
+            // Close mobile menu if open
             const rightNav = document.querySelector('.right-nav');
             if (rightNav) rightNav.classList.remove('active');
 
+            const spaMain = document.getElementById('spa-main');
+
+            // Save scroll position for the page we're leaving
+            _spaCacheSaveScroll(window.location.href);
+
+            // ── Cache hit: restore instantly ──────────────────────────────────
+            if (_spaCache.has(url)) {
+                _spaRestoreFromCache(spaMain, _spaCache.get(url), url, true);
+                return;
+            }
+
+            // ── Cache miss: fetch, store, then render ─────────────────────────
             try {
-                // Dim content to show loading
-                const spaMain = document.getElementById('spa-main');
                 spaMain.style.opacity = '0.5';
 
                 const response = await fetch(url);
@@ -132,44 +270,13 @@
                 const htmlText = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlText, 'text/html');
-
                 const newContent = doc.getElementById('spa-main');
+
                 if (newContent) {
-                    spaMain.innerHTML = newContent.innerHTML;
-                    document.title = doc.title;
-                    history.pushState({}, '', url);
-
-                    // Reset opacity and scroll to top
-                    spaMain.style.opacity = '1';
-                    window.scrollTo(0, 0);
-
-                    // Run highlighter
-                    highlightOnPage();
-
-                    // Re-initialize dynamic elements
-                    if (window.initCodeBlocks) window.initCodeBlocks();
-                    if (window.initTOC) window.initTOC();
-                    if (window.initNotes) window.initNotes();
-                    if (window.initMermaid) window.initMermaid();
-
-                    // Check banner state post-navigation
-                    const banner = document.getElementById("donationBanner");
-                    if (banner && localStorage.getItem("hideDonationBanner") !== "true") {
-                        banner.style.display = "flex";
-                        banner.style.opacity = "1";
-                        banner.style.transform = "translateY(0)";
-                    }
-
-                    // Re-run any necessary scripts within the new content (e.g. giscus)
-                    const scripts = spaMain.querySelectorAll('script');
-                    scripts.forEach(oldScript => {
-                        const newScript = document.createElement('script');
-                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                        oldScript.parentNode.replaceChild(newScript, oldScript);
-                    });
+                    // Store in cache before rendering
+                    _spaCacheSet(url, newContent.innerHTML, doc.title);
+                    _spaRestoreFromCache(spaMain, _spaCache.get(url), url, true);
                 } else {
-                    // Fallback to normal navigation if spa-main is not found
                     window.location.href = url;
                 }
             } catch (error) {
@@ -178,34 +285,28 @@
             }
         });
 
+        // ── Popstate (browser back/forward) ───────────────────────────────────
         window.addEventListener('popstate', async () => {
+            const url = window.location.href;
+            const spaMain = document.getElementById('spa-main');
+
+            // Cache hit
+            if (_spaCache.has(url)) {
+                _spaRestoreFromCache(spaMain, _spaCache.get(url), url, false);
+                return;
+            }
+
+            // Cache miss — fetch
             try {
-                const response = await fetch(window.location.href);
+                const response = await fetch(url);
                 const htmlText = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(htmlText, 'text/html');
                 const newContent = doc.getElementById('spa-main');
-                const spaMain = document.getElementById('spa-main');
 
                 if (newContent) {
-                    spaMain.innerHTML = newContent.innerHTML;
-                    document.title = doc.title;
-
-                    highlightOnPage();
-
-                    // Re-initialize dynamic elements
-                    if (window.initCodeBlocks) window.initCodeBlocks();
-                    if (window.initTOC) window.initTOC();
-                    if (window.initNotes) window.initNotes();
-                    if (window.initMermaid) window.initMermaid();
-
-                    // Check banner state post-navigation
-                    const banner = document.getElementById("donationBanner");
-                    if (banner && localStorage.getItem("hideDonationBanner") !== "true") {
-                        banner.style.display = "flex";
-                        banner.style.opacity = "1";
-                        banner.style.transform = "translateY(0)";
-                    }
+                    _spaCacheSet(url, newContent.innerHTML, doc.title);
+                    _spaRestoreFromCache(spaMain, _spaCache.get(url), url, false);
                 } else {
                     window.location.reload();
                 }
@@ -214,9 +315,30 @@
             }
         });
 
-        // Initialize highlighter on first load
-        window.addEventListener('DOMContentLoaded', highlightOnPage);
+        // ── Seed cache with the initial page load ─────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            const spaMain = document.getElementById('spa-main');
+            if (spaMain) {
+                _spaCacheSet(window.location.href, spaMain.innerHTML, document.title);
+            }
+            updateActiveNavLink();
+            highlightOnPage();
+        });
     </script>
+
+    <!-- Cinematic homepage libraries — loaded globally so SPA navigation can re-use them -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.halo.min.js"></script>
+    <script src="/js/cinematic.js"></script>
     <svg style="position: fixed; width: 0; height: 0;" aria-hidden="true" focusable="false">
         <filter id="water-filter">
             <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="1" result="noise" />

@@ -25,9 +25,10 @@ index_format = "elasticlunr_javascript"
 
 author = "Wawona Team"
 theme = "toggle" # dark, light, auto, toggle
-favicon = "images/logo/wawona.png"
-logo = "images/logo/wawona.png"
+favicon = "images/logo/Wawona-iOS-Default-1024x1024@1x.png"
+logo = "images/logo/Wawona-iOS-Default-1024x1024@1x.png"
 fancy_code = true
+stylesheets = ["css/custom.css"]
 
 menu = [
     { name = "/posts", url = "posts", weight = 1 },

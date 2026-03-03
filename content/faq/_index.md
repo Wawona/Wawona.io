@@ -82,6 +82,12 @@ template = "faq_section.html"
     opacity: 1;
 }
 
+@media (hover: none) {
+    .faq-content .faq-share {
+        opacity: 1;
+    }
+}
+
 .faq-content .faq-share:hover {
     background: var(--bg-1);
     border-color: var(--primary-color);
@@ -504,12 +510,33 @@ document.addEventListener('click', (e) => {
 // On iOS/Android a <summary> tap causes a text-selection flash before toggling.
 // Intercept touchend to toggle on the first tap, and prevent the ghost click
 // that would double-fire the click handler above.
+// FIX: We now track touch movement to ensure we don't toggle during a scroll.
+let touchStartY = 0;
+let touchStartX = 0;
+
+document.addEventListener('touchstart', (e) => {
+    const summary = e.target.closest('details summary');
+    if (!summary) return;
+    
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+}, { passive: true });
+
 document.addEventListener('touchend', (e) => {
     const summary = e.target.closest('details summary');
     if (!summary) return;
 
     // Share button is safe-zoned — let its own onclick run.
     if (e.target.closest('.faq-share')) return;
+
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+    
+    // If the touch moved more than 10px, assume it's a scroll/swipe, not a tap.
+    const deltaY = Math.abs(touchEndY - touchStartY);
+    const deltaX = Math.abs(touchEndX - touchStartX);
+    
+    if (deltaY > 10 || deltaX > 10) return;
 
     e.preventDefault(); // prevents highlight + ghost mouse click
     const details = summary.closest('details');

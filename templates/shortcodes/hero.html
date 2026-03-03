@@ -1,5 +1,8 @@
 <div align="center" style="padding: 2rem 0;">
-    <img src="/images/logo/wawona.png" width="120" alt="Wawona Logo" class="hero-logo" style="margin-bottom: 1rem;">
+    <img src="/images/logo/Wawona-iOS-Default-1024x1024@1x.png" width="120" alt="Wawona Logo"
+        class="hero-logo hero-logo-light" style="margin-bottom: 1rem;">
+    <img src="/images/logo/Wawona-iOS-Dark-1024x1024@1x.png" width="120" alt="Wawona Logo"
+        class="hero-logo hero-logo-dark" style="margin-bottom: 1rem;">
     <h1 style="margin: 0; font-size: 3.5rem; letter-spacing: -0.05rem;">{{ title | default(value="Wawona") }}</h1>
     <p style="font-size: 1.25rem; opacity: 0.85; max-width: 600px; margin-top: 1rem; line-height: 1.6;">
         {{ tagline | safe }}
@@ -8,15 +11,24 @@
 
 <style>
     .hero-logo {
-        filter: var(--logo-shadow);
-        transition: filter 0.3s ease;
+        transition: filter 0.3s ease, opacity 0.3s ease;
     }
 
-    :root.dark {
-        --logo-shadow: drop-shadow(0 0 1rem rgba(88, 166, 255, 0.45));
+    :root.dark .hero-logo-light {
+        display: none;
     }
 
-    :root.light {
-        --logo-shadow: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+    :root.dark .hero-logo-dark {
+        display: block;
+        filter: drop-shadow(0 0 1rem rgba(88, 166, 255, 0.45));
+    }
+
+    :root.light .hero-logo-light {
+        display: block;
+        filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+    }
+
+    :root.light .hero-logo-dark {
+        display: none;
     }
 </style>

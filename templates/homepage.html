@@ -28,22 +28,36 @@
                 </svg> View Source</a>
         </div>
     </div>
+    <!-- Subtle bouncing scroll hint — fades on first scroll via JS -->
+    <div class="lp-scroll-hint" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6" />
+        </svg>
+    </div>
 </section>
 
 <!-- PLATFORMS -->
 <section class="lp-section lp-platforms-strip lp-reveal">
+    <div class="lp-platforms-label">
+        <blockquote class="lp-platforms-quote">
+            <span class="lp-quote-mark lp-quote-open">“</span><span class="lp-quote-body">Build Bridges &mdash; Not
+                Walls.</span><span class="lp-quote-mark lp-quote-close">”</span>
+        </blockquote>
+        <p class="lp-quote-credit">&mdash; Alex Spaulding, 2025</p>
+    </div>
     <div class="lp-platforms">
         <div class="lp-platform" data-mouse-track="8">
             <span class="lp-platform-name">macOS</span>
             <div class="lp-platform-techs">
-                <span>Metal</span><span>Quartz</span><span>AppKit</span>
+                <span>Metal</span><span>AppKit</span><span>ObjC</span>
             </div>
         </div>
         <div class="lp-platform-divider"></div>
         <div class="lp-platform" data-mouse-track="8">
             <span class="lp-platform-name">iOS</span>
             <div class="lp-platform-techs">
-                <span>Metal</span><span>UIKit</span>
+                <span>Metal</span><span>UIKit</span><span>ObjC</span>
             </div>
         </div>
         <div class="lp-platform-divider"></div>
@@ -58,31 +72,45 @@
 
 <!-- SHOWCASE -->
 <section class="lp-section lp-showcase-wrap lp-reveal" data-parallax="0.1">
-    <div class="lp-showcase-frame" data-mouse-track="6">
-        <div class="lp-showcase-bar"><span class="lp-dot-r"></span><span class="lp-dot-y"></span><span
-                class="lp-dot-g"></span><span class="lp-showcase-bar-title" id="showcaseBarTitle">KDE Plasma &mdash;
-                Nested in Wawona</span></div>
-        <div class="lp-showcase-track" id="showcaseTrack">
-            <div class="lp-showcase-slide active" data-title="KDE Plasma &mdash; Nested in Wawona">
-                {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_plasma.png", alt="KDE Plasma
-                nested in Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
+    <div class="container">
+        <div class="lp-showcase-frame" data-mouse-track="6">
+            <div class="lp-showcase-bar"><span class="lp-dot-r"></span><span class="lp-dot-y"></span><span
+                    class="lp-dot-g"></span><span class="lp-showcase-bar-title" id="showcaseBarTitle">KDE Plasma &mdash;
+                    Nested in Wawona</span></div>
+            <div class="lp-showcase-track" id="showcaseTrack">
+                <div class="lp-showcase-slide active" data-title="KDE Plasma &mdash; Nested in Wawona">
+                    <div class="lp-showcase-img-container">
+                        {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_plasma.png", alt="KDE
+                        Plasma
+                        nested in Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
+                    </div>
+                </div>
+                <div class="lp-showcase-slide" data-title="XFCE Desktop &mdash; Composited on macOS">
+                    <div class="lp-showcase-img-container">
+                        {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_xfce.png", alt="XFCE
+                        nested in
+                        Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
+                    </div>
+                </div>
+                <div class="lp-showcase-slide" data-title="COSMIC Desktop &mdash; Running in Wawona">
+                    <div class="lp-showcase-img-container">
+                        {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_cosmic.png", alt="COSMIC
+                        nested in
+                        Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
+                    </div>
+                </div>
+                <div class="lp-showcase-slide" data-title="Native Wayland Compositing on macOS">
+                    <div class="lp-showcase-img-container">
+                        {{ img::optimized_image(path="images/wawona-screenshots/wawona-screenshot-1.png", alt="Wawona
+                        native
+                        compositing", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
+                    </div>
+                </div>
             </div>
-            <div class="lp-showcase-slide" data-title="XFCE Desktop &mdash; Composited on macOS">
-                {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_xfce.png", alt="XFCE nested in
-                Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
-            </div>
-            <div class="lp-showcase-slide" data-title="COSMIC Desktop &mdash; Running in Wawona">
-                {{ img::optimized_image(path="images/wawona-screenshots/wawona_nested_cosmic.png", alt="COSMIC nested in
-                Wawona", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
-            </div>
-            <div class="lp-showcase-slide" data-title="Native Wayland Compositing on macOS">
-                {{ img::optimized_image(path="images/wawona-screenshots/wawona-screenshot-1.png", alt="Wawona native
-                compositing", widths=[400, 800, 1600], quality=80, aspect_ratio="16/9") }}
-            </div>
+            <div class="lp-showcase-nav"><button class="lp-showcase-dot active" data-index="0"></button><button
+                    class="lp-showcase-dot" data-index="1"></button><button class="lp-showcase-dot"
+                    data-index="2"></button><button class="lp-showcase-dot" data-index="3"></button></div>
         </div>
-        <div class="lp-showcase-nav"><button class="lp-showcase-dot active" data-index="0"></button><button
-                class="lp-showcase-dot" data-index="1"></button><button class="lp-showcase-dot"
-                data-index="2"></button><button class="lp-showcase-dot" data-index="3"></button></div>
     </div>
     <div class="lp-showcase-footer">
         <a href="/gallery/">View Gallery &rarr;</a>
@@ -93,7 +121,13 @@
 <section class="lp-section">
     <div class="lp-section-inner">
         <div class="lp-section-header lp-reveal">
-            <h2>Built Different.</h2>
+            <div class="lp-bd-logo-wrap">
+                <img src="/images/logo/Wawona-iOS-Default-1024x1024@1x.png" alt="Wawona"
+                    class="lp-bd-logo lp-bd-logo-light" />
+                <img src="/images/logo/Wawona-iOS-Dark-1024x1024@1x.png" alt="Wawona"
+                    class="lp-bd-logo lp-bd-logo-dark" />
+            </div>
+            <h2 class="lp-bd-title">Built Different.</h2>
             <p>Not a VM. Not a compatibility layer. A real compositor.</p>
         </div>
         <div class="lp-pillars lp-reveal">
@@ -124,8 +158,14 @@
                 <div class="lp-pillar-glow"></div>
                 <div class="lp-pillar-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="1.5">
-                        <path
-                            d="M12 3v3m6.36-.64-2.12 2.12M21 12h-3M18.36 18.36l-2.12-2.12M12 21v-3M7.76 18.36l-2.12-2.12M6 12H3M7.76 5.64 5.64 7.76" />
+                        <path d="M12 3v3" />
+                        <path d="m18.36 5.64-2.12 2.12" />
+                        <path d="M21 12h-3" />
+                        <path d="m18.36 18.36-2.12-2.12" />
+                        <path d="M12 21v-3" />
+                        <path d="m5.64 18.36 2.12-2.12" />
+                        <path d="M3 12h3" />
+                        <path d="m5.64 5.64 2.12 2.12" />
                     </svg></div>
                 <h3>Extensible</h3>
                 <p>Port any Linux application to macOS and utilize Wayland directly on the same computer. Wawona will
@@ -141,8 +181,22 @@
 <section class="lp-features-scroll-wrapper" id="features-scroll-wrapper">
     <div class="lp-features-sticky">
         <div class="lp-section-header lp-features-header">
-            <h2>The Architecture</h2>
-            <p>Deconstructing the next-generation compositor.</p>
+            <div class="lp-arch-tag">CORE SYSTEMS</div>
+            <h2 class="lp-arch-title">The <span class="lp-gradient-text">Architecture</span></h2>
+            <div class="lp-arch-subtitle">
+                <div class="lp-arch-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid">
+                        <rect width="18" height="18" x="3" y="3" rx="2" />
+                        <path d="M3 9h18" />
+                        <path d="M3 15h18" />
+                        <path d="M9 9v6" />
+                        <path d="M15 3v6" />
+                        <path d="M15 15v6" />
+                    </svg>
+                </div>
+                <p>Deconstructing the next-generation compositor.</p>
+            </div>
         </div>
         <div class="lp-features-track" id="features-track">
 
@@ -153,43 +207,13 @@
                         Rust. This monolithic library securely orchestrates input seat management and surface rendering
                         identically across all host environments.</p>
                 </div>
-                <div class="lp-feature-visual">
-                    <div class="lp-arch-diagram">
-                        <div class="lp-arch-hub">
-                            <span class="lp-arch-hub-label">Wawona Core</span>
-                            <span class="lp-arch-hub-sub">Rust</span>
-                        </div>
-                        <div class="lp-arch-spokes">
-                            <div class="lp-arch-spoke">
-                                <div class="lp-arch-line"></div>
-                                <div class="lp-arch-chip">
-                                    <span class="lp-arch-chip-name">macOS</span>
-                                    <span class="lp-arch-chip-bind">UniFFI</span>
-                                </div>
-                            </div>
-                            <div class="lp-arch-spoke">
-                                <div class="lp-arch-line"></div>
-                                <div class="lp-arch-chip">
-                                    <span class="lp-arch-chip-name">iOS</span>
-                                    <span class="lp-arch-chip-bind">UniFFI</span>
-                                </div>
-                            </div>
-                            <div class="lp-arch-spoke">
-                                <div class="lp-arch-line"></div>
-                                <div class="lp-arch-chip">
-                                    <span class="lp-arch-chip-name">Linux</span>
-                                    <span class="lp-arch-chip-bind">Wayland</span>
-                                </div>
-                            </div>
-                            <div class="lp-arch-spoke">
-                                <div class="lp-arch-line"></div>
-                                <div class="lp-arch-chip">
-                                    <span class="lp-arch-chip-name">Android</span>
-                                    <span class="lp-arch-chip-bind">FFI / JNI</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="lp-feature-visual lp-mermaid-visual">
+                    <pre><code data-lang="mermaid">flowchart LR
+    macOS["macOS\nAppKit + Metal"] -->|UniFFI| core
+    iOS["iOS\nUIKit + Metal"] -->|UniFFI| core
+    Android["Android\nVulkan + JNI"] -->|FFI/JNI| core
+    core(["Wawona Core\nRust"])
+    core -->|Wayland| linux["Linux\nWayland Clients"]</code></pre>
                 </div>
             </div>
 
@@ -214,18 +238,17 @@
                     <h3>Zero-Copy Pipelines</h3>
                     <p>Client buffers (like IOSurface or dmabufs) are mapped directly to GPU textures in our native
                         Metal and Vulkan rendering backends. Frame delivery achieves near-instant presentation with zero
-                        intermediate copies.</p>
+                        intermediate copies. We also include userland drivers such as kosmickrisp, moltenvk, angle, and
+                        the like for creating accelerated rendering.</p>
                 </div>
                 <div class="lp-feature-visual">
-                    <div class="lp-stat-grid">
-                        <div class="lp-stat"><span class="lp-stat-num">0</span><span class="lp-stat-label">Buffer
-                                Copies</span></div>
-                        <div class="lp-stat"><span class="lp-stat-num">Native</span><span class="lp-stat-label">Refresh
-                                Rates</span></div>
-                        <div class="lp-stat"><span class="lp-stat-num">Metal</span><span class="lp-stat-label">macOS /
-                                iOS</span></div>
-                        <div class="lp-stat"><span class="lp-stat-num">Vulkan</span><span
-                                class="lp-stat-label">Android</span></div>
+                    <div class="lp-drivers-visual">
+                        <div class="lp-drivers-label">USERLAND STACK</div>
+                        <div class="lp-drivers-grid">
+                            <div class="lp-driver-card">KosmicKrisp</div>
+                            <div class="lp-driver-card">MoltenVK</div>
+                            <div class="lp-driver-card">ANGLE</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -247,6 +270,30 @@
             </div>
 
         </div>
+
+        <!-- Scrollyboard Timeline Progress Indicator -->
+        <div class="lp-sb-timeline" id="sb-timeline" aria-hidden="true">
+            <div class="lp-sb-tl-row">
+                <div class="lp-sb-tl-fill" id="sb-tl-fill"></div>
+                <div class="lp-sb-tl-step active" data-index="0">
+                    <div class="lp-sb-tl-dot"></div>
+                    <span class="lp-sb-tl-label">Rust Core</span>
+                </div>
+                <div class="lp-sb-tl-step" data-index="1">
+                    <div class="lp-sb-tl-dot"></div>
+                    <span class="lp-sb-tl-label">Native Windows</span>
+                </div>
+                <div class="lp-sb-tl-step" data-index="2">
+                    <div class="lp-sb-tl-dot"></div>
+                    <span class="lp-sb-tl-label">Zero-Copy</span>
+                </div>
+                <div class="lp-sb-tl-step" data-index="3">
+                    <div class="lp-sb-tl-dot"></div>
+                    <span class="lp-sb-tl-label">FFI Bridge</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 
@@ -264,9 +311,9 @@
             <p>Build guides, architecture, and configuration references.</p><span class="lp-explore-arrow">&rarr;</span>
         </a>
         <a href="/faq/" class="lp-explore-card" data-mouse-track="4"><svg width="24" height="24" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" stroke-width="1.5">
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10" />
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3V14" />
                 <path d="M12 17h.01" />
             </svg>
             <h3>FAQ</h3>
@@ -315,11 +362,11 @@
         <div class="lp-col-card">
             <div class="lp-col-header"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2">
-                    <path d="M12 2v4" />
-                    <path d="m15.2 7.4.8-.8 2.8 2.8-.8.8" />
-                    <path d="M12 10a4 4 0 1 0 0 8" />
-                    <path d="M12 18v4" />
-                    <circle cx="12" cy="14" r="1" />
+                    <path d="m7.5 4.27 9 5.15" />
+                    <path
+                        d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                    <path d="m3.3 7 8.7 5 8.7-5" />
+                    <path d="M12 22V12" />
                 </svg>
                 <h3>Latest Releases</h3>
             </div>
@@ -381,42 +428,15 @@
     </div>
 </section>
 
-<!-- FOOTER CREDIT -->
-<footer class="lp-footer">
-    <p>Created by <a href="https://aspauldingcode.com" target="_blank" rel="noopener">Alex Spaulding</a></p>
-    <p class="lp-footer-sub">Wawona is free and open-source software under the <a
-            href="https://github.com/aspauldingcode/Wawona/blob/main/LICENSE" target="_blank" rel="noopener">MIT
-            License</a>.</p>
-</footer>
 
-<!-- CINEMATIC WAWONA REDESIGN SCRIPTS -->
-<!-- Lenis for smooth scroll -->
-<script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-<!-- GSAP & ScrollTrigger -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<!-- Three.js (Module version for better performance) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<!-- WebGL HDR Post-Processing -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/EffectComposer.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/RenderPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/ShaderPass.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/shaders/CopyShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-<!-- Vanta (Optional helper for particles/WebGL backgrounds if we want a quick abstract shader) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.halo.min.js"></script>
-<!-- Custom Cinematic Logic -->
-<script src="/js/cinematic.js"></script>
-
-<!-- Mermaid JS Diagram Rendering -->
-<script type="module">
-    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-    mermaid.initialize({
-        startOnLoad: true,
-        theme: 'dark', // Fits best with Wawona aesthetic natively
-        flowchart: { curve: 'basis' }
-    });
+<!-- Mermaid re-initialisation for homepage scrollyboard (library loaded globally in base.html) -->
+<script>
+    // Re-run Mermaid after GSAP has laid out the cards so it finds the code block.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => { if (window.initMermaid) window.initMermaid(); });
+    } else {
+        if (window.initMermaid) window.initMermaid();
+    }
 </script>
 
 {% include "partials/homepage_scripts.html" %}

@@ -1,0 +1,80 @@
+/* ===== THEME-AWARE NAVIGATION LOGO ===== */
+
+/* Default state (before JS runs): show the light logo */
+.nav-logo-light {
+    display: block;
+}
+
+.nav-logo-dark {
+    display: none;
+}
+
+:root.dark .nav-logo-light {
+    display: none;
+}
+
+:root.dark .nav-logo-dark {
+    display: block;
+}
+
+:root.light .nav-logo-light {
+    display: block;
+}
+
+:root.light .nav-logo-dark {
+    display: none;
+}
+
+/* ===== NAV LOGO GROUP (Apollo theme vars) ===== */
+nav .logo {
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    color: var(--text-0) !important;
+    z-index: 1;
+}
+
+nav .logo::before {
+    content: '';
+    position: absolute;
+    left: var(--mouse-x, 50%);
+    top: var(--mouse-y, 50%);
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, var(--primary-color) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    filter: blur(10px);
+}
+
+@media (hover: hover) {
+    nav .logo:hover::before {
+        opacity: 0.15;
+    }
+}
+
+@media (hover: hover) {
+    nav .logo:hover {
+        background: var(--bg-1) !important;
+    }
+}
+
+/* ===== NAV LOGO & TITLE GLOW ===== */
+nav .logo .nav-logo {
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    transition: filter 0.3s ease;
+}
+
+nav .logo:hover .nav-logo {
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.35)) drop-shadow(0 2px 5px rgba(0, 0, 0, 0.25));
+}
+
+/* ===== ACTIVE NAV LINK ===== */
+/* Applied by JS to the .right-nav link matching the current route (excluding homepage). */
+.right-nav a.nav-active {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+}

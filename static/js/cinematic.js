@@ -7,6 +7,12 @@ function runCinematicSetup() {
     // Only run if we actually have a hero section on this page
     if (!document.getElementById('hero-section')) return;
 
+    // Kill any stale GSAP ScrollTrigger instances from a previous page load
+    // (critical for SPA navigation — prevents dead pinned sections from stacking)
+    if (window.ScrollTrigger) {
+        ScrollTrigger.getAll().forEach(t => t.kill());
+    }
+
     // 1. Initialize Lenis for Smooth Scrolling ONLY ONCE globally
     if (!window._cinematicLenis) {
         window._cinematicLenis = new Lenis({
@@ -45,6 +51,9 @@ function runCinematicSetup() {
 
     console.log("Cinematic Experience Initialized");
 }
+
+// Expose globally so the SPA router can call it after each navigation to /
+window.runCinematicSetup = runCinematicSetup;
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runCinematicSetup);
@@ -93,17 +102,25 @@ function initCustomCursor() {
 
     const cursor = document.createElement('div');
     cursor.classList.add('custom-cursor');
-    // Start hidden, only show in hero
+    // Start hidden
     cursor.style.opacity = '0';
     document.body.appendChild(cursor);
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
-    const heroSection = document.getElementById('hero-section');
 
-    if (!heroSection) return;
+    // Global functions to toggle states from other scripts
+    window.setCustomCursorHover = (state) => {
+        if (state) cursor.classList.add('is-hovering');
+        else cursor.classList.remove('is-hovering');
+    };
 
-    // Follow mouse
+    window.setCustomCursorSwiping = (state) => {
+        if (state) cursor.classList.add('is-swiping');
+        else cursor.classList.remove('is-swiping');
+    };
+
+    // Follow mouse globally
     window.addEventListener('mousemove', (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
@@ -115,42 +132,32 @@ function initCustomCursor() {
         });
     });
 
-    // Only show cursor when inside hero section
-    heroSection.addEventListener('mouseenter', () => {
-        gsap.to(cursor, { opacity: 1, duration: 0.3 });
-        // Hide default cursor in hero
-        heroSection.style.cursor = 'none';
+    const activeSections = [
+        document.getElementById('hero-section'),
+        document.querySelector('.lp-showcase-frame')
+    ].filter(Boolean);
 
-        // Hide cursor on interactive elements in hero too
-        const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
-        interactiveElements.forEach(el => {
-            el.style.cursor = 'none';
+    activeSections.forEach(section => {
+        section.addEventListener('mouseenter', () => {
+            gsap.to(cursor, { opacity: 1, duration: 0.3 });
+            section.style.cursor = 'none';
+
+            // Hide default cursor on interactive elements within these sections
+            const interactive = section.querySelectorAll('a, button, .lp-btn, .lp-showcase-slide');
+            interactive.forEach(el => {
+                el.style.cursor = 'none';
+                if (!el.dataset.cursorBound) {
+                    el.addEventListener('mouseenter', () => window.setCustomCursorHover(true));
+                    el.addEventListener('mouseleave', () => window.setCustomCursorHover(false));
+                    el.dataset.cursorBound = "true";
+                }
+            });
         });
-    });
 
-    heroSection.addEventListener('mouseleave', () => {
-        gsap.to(cursor, { opacity: 0, duration: 0.3 });
-        cursor.classList.remove('is-hovering');
-        // Restore default cursor outside hero
-        heroSection.style.cursor = 'auto';
-
-        const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
-        interactiveElements.forEach(el => {
-            el.style.cursor = 'pointer';
-        });
-    });
-
-    // Hover states for links and buttons ONLY within the hero section
-    const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
-    interactiveElements.forEach(el => {
-        // Initial setup for the elements inside the hero so they don't show the default pointer
-        el.style.cursor = 'none';
-
-        el.addEventListener('mouseenter', () => {
-            cursor.classList.add('is-hovering');
-        });
-        el.addEventListener('mouseleave', () => {
-            cursor.classList.remove('is-hovering');
+        section.addEventListener('mouseleave', () => {
+            gsap.to(cursor, { opacity: 0, duration: 0.3 });
+            window.setCustomCursorHover(false);
+            section.style.cursor = 'auto';
         });
     });
 }
@@ -161,6 +168,9 @@ function initHorizontalScroll() {
     const wrapper = document.getElementById('features-scroll-wrapper');
     const track = document.getElementById('features-track');
     const cards = gsap.utils.toArray('.lp-feature-card');
+    const tlSteps = document.querySelectorAll('.lp-sb-tl-step');
+    const tlFill = document.getElementById('sb-tl-fill');
+    const tlRow = document.querySelector('.lp-sb-tl-row');
 
     if (!wrapper || !track || cards.length === 0 || !window.gsap) return;
 
@@ -172,81 +182,129 @@ function initHorizontalScroll() {
         }
     });
 
+    let tlFillPcts = [];
+
+    function calculateTlPcts() {
+        if (!tlRow || tlSteps.length === 0) return;
+        const rowRect = tlRow.getBoundingClientRect();
+        const rowWidth = rowRect.width;
+
+        tlFillPcts = Array.from(tlSteps).map(step => {
+            const dot = step.querySelector('.lp-sb-tl-dot');
+            const dotRect = dot.getBoundingClientRect();
+            // Center of dot relative to row start
+            const dotCenter = (dotRect.left + dotRect.width / 2) - rowRect.left;
+            return (dotCenter / rowWidth) * 100;
+        });
+    }
+
+    // Initial calculation
+    calculateTlPcts();
+    window.addEventListener('resize', calculateTlPcts);
+
     const tl = gsap.timeline({
         scrollTrigger: {
             trigger: wrapper,
             start: "top top",
-            // Add an extra 2 screens of scrolling distance to account for our huge deadzones,
-            // so panning between cards still feels 1:1 with track size
-            end: () => `+=${track.scrollWidth + (window.innerHeight * 2)}`,
+            end: () => `+=${track.scrollWidth + window.innerHeight}`,
             pin: true,
-            scrub: 1.5,
-            snap: {
-                snapTo: "labels",
-                duration: { min: 0.3, max: 0.8 },
-                ease: "power2.inOut",
-                delay: 0.1
+            scrub: 0.2,
+            invalidateOnRefresh: true,
+            onLeave: () => {
+                // Ensure completion on exit
+                if (tlSteps.length && tlFill) {
+                    tlSteps.forEach(step => {
+                        step.classList.remove('active');
+                        step.classList.add('visited');
+                    });
+                    gsap.to(tlFill, { width: '100%', duration: 0.3, overwrite: "auto" });
+                }
             },
-            invalidateOnRefresh: true
+            onEnterBack: () => {
+                // Return will be handled by onUpdate
+            },
+            snap: {
+                snapTo: (value) => {
+                    const totalDuration = tl.totalDuration();
+                    const progressLabels = [0, 1, ...Object.values(tl.labels).map(t => t / totalDuration)].sort((a, b) => a - b);
+
+                    let closest = progressLabels[0];
+                    let minDiff = Math.abs(value - closest);
+                    for (let i = 1; i < progressLabels.length; i++) {
+                        const diff = Math.abs(value - progressLabels[i]);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            closest = progressLabels[i];
+                        }
+                    }
+                    return closest;
+                },
+                duration: { min: 0.2, max: 0.6 },
+                ease: "power2.inOut",
+                delay: 0.3
+            }
         }
     });
 
-    // Start label: deadzone before moving
-    // Huge pause (absorbs 1 full screen of scrolling)
+    // Entry animation
+    tl.fromTo(track, { opacity: 0, y: 50 }, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "power2.out"
+    });
     tl.addLabel("card0");
-    tl.to({}, { duration: 3.0 });
+
+    // Track whether we have reached the "exiting" phase (past the last card)
+    let tlCompleted = false;
+
+    function setTlCompleted(val) {
+        tlCompleted = val;
+        if (!tlSteps.length || !tlFill) return;
+        if (val) {
+            tlSteps.forEach(step => {
+                step.classList.remove('active');
+                step.classList.add('visited');
+            });
+            gsap.to(tlFill, { width: '100%', duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+        }
+    }
 
     for (let i = 1; i < cards.length; i++) {
         tl.to(track, {
             x: () => {
                 const cardLeft = cards[i].offsetLeft;
-                // Align to 5vw margin to match the "The Architecture" header perfectly
                 const leftAlignOffset = window.innerWidth * 0.05;
-
                 return -(cardLeft - leftAlignOffset);
             },
             ease: "none",
             duration: 1
         });
-
-        // Exact left-aligned label
         tl.addLabel(`card${i}`);
-
-        // Pause at label to hold focus over scroll
         if (i === cards.length - 1) {
-            // Huge pause for the very last card (absorbs 1 full screen of scrolling)
-            tl.to({}, { duration: 3.0 });
+            tl.to(track, {
+                opacity: 0,
+                y: -50,
+                duration: 0.5,
+                ease: "power2.in",
+                onStart: () => setTlCompleted(true),
+                onReverseComplete: () => setTlCompleted(false)
+            });
         } else {
-            // Tiny pause to help snapping between middle cards
             tl.to({}, { duration: 0.35 });
         }
     }
 
-    // Dynamic fade-in/out scale depending on closest card perfectly aligned with scroll tracking
     tl.eventCallback("onUpdate", () => {
-
         let closestIndex = 0;
         let minDistance = Infinity;
-
-        // trackX represents raw horizontal movement distance backwards. e.g. 0 to -3000px
         const currentScrollX = gsap.getProperty(track, "x") || 0;
 
         cards.forEach((card, i) => {
-            // Evaluates mathematical perfect alignment of this card matching 5vw padding left
             const perfectAlignScrollX = -(card.offsetLeft - (window.innerWidth * 0.05));
-
-            // Distance from where we are currently scrubbed vs where we need to be to center this card
             let scrubDistance = currentScrollX - perfectAlignScrollX;
             let absDistance = Math.abs(scrubDistance);
-
-            // The bias math: If the user hasn't physically reached the card yet (scrubDistance > 0),
-            // manually shrink its distance constraint early, allowing it to mathematically win focus much sooner 
-            // than halfway. 
-            if (scrubDistance > 0) {
-                // Bias of 350px - the card wakes up extremely early!
-                absDistance = Math.max(0, absDistance - 350);
-            }
-
+            if (scrubDistance > 0) absDistance = Math.max(0, absDistance - 350);
             if (absDistance < minDistance) {
                 minDistance = absDistance;
                 closestIndex = i;
@@ -254,15 +312,162 @@ function initHorizontalScroll() {
         });
 
         cards.forEach((c, i) => {
-            if (i === closestIndex) {
-                // Active leftmost card: crisp, glowing, full size (Removed blur per user request)
+            if (i === closestIndex && !tlCompleted) {
                 gsap.to(c, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
             } else {
-                // Inactive cards deeply recede 
                 gsap.to(c, { opacity: 0.15, scale: 0.9, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
             }
         });
+
+        // Only update indicator if NOT in completed state (setTlCompleted handles that)
+        if (!tlCompleted && tlSteps.length && tlFill) {
+            tlSteps.forEach((step, i) => {
+                step.classList.toggle('active', i === closestIndex);
+                step.classList.toggle('visited', i < closestIndex);
+            });
+            gsap.to(tlFill, {
+                width: (tlFillPcts[closestIndex] || 0) + '%',
+                duration: 0.4,
+                ease: 'power2.out',
+                overwrite: 'auto'
+            });
+        }
     });
+
+    // --- Mobile Swipe Navigation ---
+    let startX = 0;
+    let startY = 0;
+    let isSwiping = false;
+    let currentActiveIndex = 0;
+    // targetCardIndex is the authoritative index: updated ONLY on confirmed navigations.
+    // This avoids drift from the biased currentActiveIndex used for visual effects.
+    let targetCardIndex = 0;
+
+    function navigateToIndex(index, duration = 0.6) {
+        const labelName = `card${index}`;
+        const st = tl.scrollTrigger;
+        if (!st) return;
+
+        const labelTime = tl.labels[labelName];
+        let progress = 0;
+
+        if (labelTime !== undefined) {
+            progress = labelTime / tl.totalDuration();
+        } else {
+            console.warn("Label not found", labelName);
+            progress = index / (cards.length - 1);
+        }
+
+        // Lock destination before async scroll
+        targetCardIndex = index;
+        const scrollTarget = st.start + (st.end - st.start) * progress;
+
+        // Debugging to ensure clicks are registering
+        console.log(`Navigating to ${labelName} (Index ${index}), Target: ${scrollTarget}px, Progress: ${progress}`);
+
+        if (window._cinematicLenis) {
+            // Do not call .stop() here as it may abort the programmatic scrollTo.
+            window._cinematicLenis.scrollTo(scrollTarget, {
+                duration: duration,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+            });
+        } else {
+            window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+        }
+    }
+
+    // === Click-to-Navigate on timeline dots ===
+    tlSteps.forEach((step, i) => {
+        // Ensure steps can receive clicks even if overlap is tricky
+        step.style.pointerEvents = 'auto';
+        step.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigateToIndex(i);
+        });
+    });
+
+    // === Swipe Listeners (Mobile Direct Control) ===
+    let swipeIntent = null; // 'horizontal' | 'vertical' | null
+    let lastX = 0;
+
+    wrapper.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        lastX = startX;
+        swipeIntent = null;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchmove', (e) => {
+        const curX = e.touches[0].clientX;
+        const curY = e.touches[0].clientY;
+        const diffX = startX - curX;
+        const diffY = startY - curY;
+        const dX = Math.abs(diffX);
+        const dY = Math.abs(diffY);
+
+        // Classify intent carefully
+        if (!swipeIntent && (dX > 5 || dY > 5)) {
+            if (dY > dX) {
+                swipeIntent = 'vertical';
+                return;
+            } else {
+                swipeIntent = 'horizontal';
+            }
+        }
+
+        if (swipeIntent === 'horizontal') {
+            if (e.cancelable) e.preventDefault();
+
+            // Calculate incremental movement for fluid "scrubbing"
+            const deltaX = lastX - curX;
+            lastX = curX;
+
+            // Map horizontal delta to vertical scroll
+            // We scale it so one swipe across the screen moves roughly one card
+            const st = tl.scrollTrigger;
+            if (st) {
+                const scrollRange = st.end - st.start;
+                const scrollStretch = scrollRange / (cards.length - 1);
+                const sensitivity = scrollStretch / (window.innerWidth * 0.8);
+
+                const scrollDelta = deltaX * sensitivity * 0.8;
+
+                if (window._cinematicLenis) {
+                    window._cinematicLenis.scrollTo(window.scrollY + scrollDelta, { immediate: true });
+                } else {
+                    window.scrollBy(0, scrollDelta);
+                }
+            }
+        }
+    }, { passive: false });
+
+    wrapper.addEventListener('touchend', () => {
+        swipeIntent = null;
+    }, { passive: true });
+
+    wrapper.addEventListener('touchcancel', () => {
+        swipeIntent = null;
+    }, { passive: true });
+
+    // === Scrollwheel Mapping ===
+    wrapper.addEventListener('wheel', (e) => {
+        const dX = e.deltaX;
+        const dY = e.deltaY;
+
+        // If user is clearly scrolling horizontally (trackpad / shift+scroll)
+        if (Math.abs(dX) > Math.abs(dY) && Math.abs(dX) > 5) {
+            e.preventDefault();
+            const scrollDelta = dX * 1.2;
+
+            if (window._cinematicLenis) {
+                window._cinematicLenis.scrollTo(window.scrollY + scrollDelta, { immediate: true });
+            } else {
+                window.scrollBy(0, scrollDelta);
+            }
+        }
+    }, { passive: false });
+
 }
 
 
@@ -307,10 +512,16 @@ function initHeroWebGL() {
     const cameraFG = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
     cameraFG.position.z = 1000;
 
-    // Vibrant colors (HDR bloom is removed, relying on soft texture blending)
-    const colorPrimary = new THREE.Color(0xff3344);
-    const colorWhite = new THREE.Color(0xffffff);
-    const colorDark = new THREE.Color(0xaa2233);
+    // --- Theme-aware particle palettes ---
+    // Dark mode: white sparkles with red accents (brilliant against black background)
+    const dark_colorMain = new THREE.Color(0xffffff); // 80% brilliant white
+    const dark_colorAccent = new THREE.Color(0xff3344); // 15% saturated red
+    const dark_colorDeep = new THREE.Color(0xaa2233); //  5% deep crimson
+    // Light mode: deep blue/purple — dark enough that HDR bloom stays vivid, never white.
+    // Close (HDR-boosted) particles glow as rich cobalt/violet; far particles read dark against white bg.
+    const light_colorMain = new THREE.Color(0x1d4ed8); // 65% deep cobalt — blooms to vivid electric blue
+    const light_colorAccent = new THREE.Color(0x6d28d9); // 25% deep violet — blooms to vivid purple
+    const light_colorDeep = new THREE.Color(0x0c0a1e); // 10% near-black navy — far specks on white bg
 
     // Setup Renderers (No EffectComposer to preserve perfect Alpha transparency over the DOM)
     function createRenderer(canvas) {
@@ -324,40 +535,52 @@ function initHeroWebGL() {
     _heroRendererBG = createRenderer(canvasBG);
     _heroRendererFG = createRenderer(canvasFG);
 
-    // Create a procedural glowing square particle texture
-    function createSquareGlowTexture() {
+    // Create a procedural glowing square pixel star texture
+    function createSquareStarTexture() {
         const canvas = document.createElement('canvas');
-        canvas.width = 128; // Increased resolution for smoother wide glow
-        canvas.height = 128;
+        canvas.width = 256; // High resolution for wide bloom gradients
+        canvas.height = 256;
         const ctx = canvas.getContext('2d');
 
-        // Faint outer square glow
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-        ctx.fillRect(16, 16, 96, 96);
+        // 1. Extreme Outer Square Glow (faint aura)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.fillRect(32, 32, 192, 192);
 
-        // Mid square glow
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.fillRect(32, 32, 64, 64);
+        // 2. Main Star Body (brighter square bloom)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.fillRect(64, 64, 128, 128);
 
-        // Core glow
+        // 3. Persistent Core (the star pixel)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.fillRect(48, 48, 32, 32);
+        ctx.fillRect(96, 96, 64, 64);
 
-        // Crisp inner square pixel
+        // 4. Brilliant inner core
         ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
-        ctx.fillRect(56, 56, 16, 16);
+        ctx.fillRect(112, 112, 32, 32);
+
+        // 5. High-intensity center pixel
+        ctx.fillStyle = 'rgba(255, 255, 255, 1.0)';
+        ctx.fillRect(122, 122, 12, 12);
 
         const tex = new THREE.Texture(canvas);
         tex.needsUpdate = true;
         return tex;
     }
-    const particleTexture = createSquareGlowTexture();
+    const particleTexture = createSquareStarTexture();
 
     // Create a unified particle system
     const geometry = new THREE.BufferGeometry();
-    const particleCount = 3500;
+    const particleCount = 1200;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
+    // Pre-generate one random value per particle and reuse it forever.
+    // This ensures colors are truly "set once" — re-calling fillParticleColors
+    // (e.g. on theme toggle) maps the same palette to the same particles.
+    const particleRands = new Float32Array(particleCount);
+
+    for (let i = 0; i < particleCount; i++) {
+        particleRands[i] = Math.random();
+    }
 
     for (let i = 0; i < positions.length; i += 3) {
         // Expand the sphere so particles fly around the camera at (0,0,1000)
@@ -369,37 +592,51 @@ function initHeroWebGL() {
         positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
         positions[i + 2] = r * Math.cos(phi);
 
-        // Mix colors
-        const rand = Math.random();
-        let mixedColor;
-        if (rand > 0.20) {
-            mixedColor = colorWhite;   // 80% white
-        } else if (rand > 0.05) {
-            mixedColor = colorPrimary; // 15% red
-        } else {
-            mixedColor = colorDark;    // 5% dark
-        }
-
-        colors[i] = mixedColor.r;
-        colors[i + 1] = mixedColor.g;
-        colors[i + 2] = mixedColor.b;
     }
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
+    // Fill vertex colors from the correct palette for the active theme.
+    // Uses pre-seeded particleRands so the per-particle color bucket never changes.
+    function fillParticleColors(dark) {
+        const cMain = dark ? dark_colorMain : light_colorMain;
+        const cAccent = dark ? dark_colorAccent : light_colorAccent;
+        const cDeep = dark ? dark_colorDeep : light_colorDeep;
+        for (let p = 0; p < particleCount; p++) {
+            const rand = particleRands[p];
+            const c = rand > 0.20 ? cMain : rand > 0.05 ? cAccent : cDeep;
+            colors[p * 3] = c.r;
+            colors[p * 3 + 1] = c.g;
+            colors[p * 3 + 2] = c.b;
+        }
+        geometry.attributes.color.needsUpdate = true;
+    }
+
+    const isDark = document.documentElement.classList.contains('dark');
+
+    // Seed initial colors
+    fillParticleColors(isDark);
+
     const material = new THREE.PointsMaterial({
-        size: 30.0, // Scale so the inner crisp square resolves beautifully, with its giant bloom aura
+        size: 40.0, // Scale so the radial bloom resolves beautifully
         map: particleTexture,
         vertexColors: true,
         transparent: true,
-        opacity: 0.95,
+        opacity: 1.0,
         sizeAttenuation: true,
-        blending: THREE.NormalBlending, // NormalBlending allows red to strictly occlude white text natively!
+        blending: THREE.NormalBlending,
         depthWrite: false
     });
 
-    // Custom shader injection for HDR depth brightness and alpha fading
+    // In light mode, tint the material with a deep blue so the HDR intensity multiplier
+    // can never blow the RGB channels into white — the tint clamps R & G to safe levels.
+    if (!isDark) {
+        material.color.set(0x4466ff); // Blue tint: R=0.27, G=0.40, B=1.0 — maxes out at vivid blue
+        material.opacity = 1.0;
+    }
+
+    // Custom shader injection for HDR depth brightness, gloom/blur, and alpha fading
     material.onBeforeCompile = (shader) => {
         shader.vertexShader = `
             varying float vDepth;
@@ -410,8 +647,16 @@ function initHeroWebGL() {
             `#include <project_vertex>`,
             `#include <project_vertex>
              vDepth = - mvPosition.z;
+             
+             // Distance ratio (0.0 when far away, up to 2.0 when right at camera plane)
+             float distRatio = max(0.0, (1000.0 - vDepth) / 500.0);
+             
+             // Bloom effect: Near-camera particles expand their glow area massively 
+             // to allow the fragment shader to render a wide, blurred gloom effect.
+             gl_PointSize *= ( 1.0 + 3.0 * pow(distRatio, 2.8) );
+             
              // Fade out particles that get too close to the screen, but keep them semi-transparent
-             vAlphaFade = mix(0.4, 1.0, smoothstep(100.0, 500.0, vDepth));`
+             vAlphaFade = mix(0.2, 1.0, smoothstep(50.0, 600.0, vDepth));`
         );
 
         shader.fragmentShader = `
@@ -422,10 +667,32 @@ function initHeroWebGL() {
         shader.fragmentShader = shader.fragmentShader.replace(
             `#include <color_fragment>`,
             `#include <color_fragment>
-             // HDR distance multiplier: particles closer than 1000 units glow vastly brighter
-             float intensity = 1.0 + max(0.0, (1100.0 - vDepth) / 100.0);
-             diffuseColor.rgb *= intensity;
-             diffuseColor.a *= vAlphaFade;
+              // Distance metric for close-up HDR effects
+              float distRatio = max(0.0, (1000.0 - vDepth) / 500.0);
+
+              // HDR distance multiplier: objects closer than the camera plane shine like brilliant stars
+              // Exponential intensity creates vibrant blooming hot-spots
+              float intensity = 1.0 + 15.0 * pow(distRatio, 3.2);
+              
+              // Procedural Blur & Gloom for particles entering bounds near camera
+              // We map gl_PointCoord to center
+              vec2 pCoord = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y) - 0.5;
+              
+              // Calculate distances to morph from crisp Square (far) to soft Radial Bloom (near)
+              float dSq = max(abs(pCoord.x), abs(pCoord.y)) * 2.0;
+              float dRad = length(pCoord) * 2.0;
+              
+              // As the particle gets closer, we heavily blur the edges into a radial bloom/gloom halo
+              // The smoothstep 'edge' drops as the particle gets closer, mathematically softening it.
+              float bloomSoftness = mix(1.0, 0.1, min(1.0, distRatio * 1.2)); 
+              float morphToRadial = min(1.0, distRatio * 1.5);
+              
+              float gloomAlpha = 1.0 - smoothstep(bloomSoftness - 0.1, 1.0, mix(dSq, dRad, morphToRadial));
+
+              diffuseColor.rgb *= intensity;
+              
+              // Apply the gloom blur mix. Distant stars use original texture alpha; near stars are overtaken by the radial bloom halo.
+              diffuseColor.a *= vAlphaFade * mix(1.0, gloomAlpha, min(1.0, distRatio * 2.0));
             `
         );
     };
@@ -471,16 +738,16 @@ function initHeroWebGL() {
         // If the section isn't in the DOM at all anymore, pause rendering to save battery
         if (!document.getElementById('hero-section')) return;
 
-        targetX = mouseX * 0.5;
-        targetY = mouseY * 0.5;
+        targetX = mouseX * 0.28;  // middle-ground sensitivity
+        targetY = mouseY * 0.28;
 
-        // Rotate the unified scene
-        particleSystem.rotation.x += 0.0005;
-        particleSystem.rotation.y += 0.001;
+        // Rotate the unified scene (minimal idle drift)
+        particleSystem.rotation.x += 0.0001;
+        particleSystem.rotation.y += 0.0002;
 
-        // Camera smoothly follows mouse
-        camPosX += (targetX - camPosX) * 0.02;
-        camPosY += (- targetY - camPosY) * 0.02;
+        // Camera gently drifts toward mouse
+        camPosX += (targetX - camPosX) * 0.012;
+        camPosY += (- targetY - camPosY) * 0.012;
 
         // Sync both cameras identically
         cameraBG.position.x = camPosX;
@@ -500,25 +767,24 @@ function initHeroWebGL() {
     // --- Thematic Color Switching ---
     const isDarkTheme = () => document.documentElement.classList.contains('dark');
 
-    // On dark theme: brilliant white and saturated red glowing against black
-    const darkThemeColor = new THREE.Color(0xffffff);
-    // On light theme: sophisticated, muted ruby red glowing against white
-    const lightThemeColor = new THREE.Color(0xd12a42);
+    // Apply the correct opacity tint for initial theme
+    if (!isDarkTheme()) material.opacity = 1.0;
 
-    // Set initial colors based on current theme state
-    if (!isDarkTheme()) {
-        material.color.copy(lightThemeColor);
-        // Slightly lower opacity for light mode
-        material.opacity = 0.85;
-    }
-
-    // Watch for theme toggle changes
+    // Watch for theme toggle — re-seed vertex colors, reset material tint and opacity
     const themeObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 const dark = isDarkTheme();
-                material.color.copy(dark ? darkThemeColor : lightThemeColor);
-                material.opacity = dark ? 0.95 : 0.85;
+                fillParticleColors(dark);
+                if (dark) {
+                    // Dark: white material tint (neutral), full opacity
+                    material.color.set(0xffffff);
+                    material.opacity = 1.0;
+                } else {
+                    // Light: blue tint prevents HDR blowout to white
+                    material.color.set(0x4466ff);
+                    material.opacity = 1.0;
+                }
             }
         });
     });
