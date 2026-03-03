@@ -116,7 +116,7 @@ function initHorizontalScroll() {
 
     // Start label: deadzone before moving
     tl.addLabel("card0");
-    tl.to({}, { duration: 0.35 });
+    tl.to({}, { duration: 1.0 });
 
     for (let i = 1; i < cards.length; i++) {
         tl.to(track, {
