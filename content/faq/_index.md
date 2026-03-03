@@ -32,6 +32,9 @@ template = "faq_section.html"
     align-items: center;
     gap: 0.75rem;
     user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     transition: background-color 0.2s ease;
     background: none;
     border-radius: 10px;
@@ -475,7 +478,65 @@ function copyFaqLink(event, id) {
     }
 }
 
-// Auto-expand and scroll to FAQ if hash is present
+// ── Unified summary click handler (desktop + mobile) ─────────────────────────
+// We take full control of ALL <summary> clicks so the .faq-share button
+// (which lives inside <summary>) can never accidentally fire the native
+// <details> toggle — stopPropagation() alone isn't enough because the browser's
+// built-in toggle action isn't a bubbled event in all implementations.
+document.addEventListener('click', (e) => {
+    const summary = e.target.closest('details summary');
+    if (!summary) return;
+
+    // Suppress the native toggle unconditionally — we manage it ourselves.
+    e.preventDefault();
+
+    // If the click was on the share button, do nothing further here;
+    // its own onclick="copyFaqLink(...)" will still fire.
+    if (e.target.closest('.faq-share')) return;
+
+    const details = summary.closest('details');
+    if (details) {
+        details.open = !details.open; // fires the toggle event → URL + scroll
+    }
+}, false);
+
+// ── Mobile touch fix ──────────────────────────────────────────────────────────
+// On iOS/Android a <summary> tap causes a text-selection flash before toggling.
+// Intercept touchend to toggle on the first tap, and prevent the ghost click
+// that would double-fire the click handler above.
+document.addEventListener('touchend', (e) => {
+    const summary = e.target.closest('details summary');
+    if (!summary) return;
+
+    // Share button is safe-zoned — let its own onclick run.
+    if (e.target.closest('.faq-share')) return;
+
+    e.preventDefault(); // prevents highlight + ghost mouse click
+    const details = summary.closest('details');
+    if (details) {
+        details.open = !details.open;
+    }
+}, { passive: false });
+
+// ── Update URL hash & auto-scroll when a question is expanded ────────────────
+document.addEventListener('toggle', (e) => {
+    const details = e.target;
+    if (details.tagName !== 'DETAILS' || !details.id) return;
+
+    if (details.open) {
+        // Push the anchor into the URL without triggering a page reload
+        history.replaceState(null, '', '#' + details.id);
+        // Smooth-scroll the question into view
+        details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        // If closing the currently-anchored item, clear the hash
+        if (window.location.hash === '#' + details.id) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+    }
+}, true); // use capture so it fires before any other handlers
+
+// ── Auto-expand and scroll to FAQ if hash is present on load ─────────────────
 window.addEventListener('load', () => {
     const hash = window.location.hash.substring(1);
     if (hash) {
@@ -487,7 +548,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// Also handle hash changes if the user clicks a copied link while on the same page
+// ── Handle hash changes (e.g. clicking a copied link while on the same page) ──
 window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
     if (hash) {

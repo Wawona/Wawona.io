@@ -155,29 +155,12 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        background-color: #050505;
-        /* Force dark background for WebGL */
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        box-sizing: border-box;
     }
 
-    /* Force hero text/badges to contrast against the dark WebGL space */
-    .lp-hero .lp-hero-title,
-    .lp-hero .lp-hero-sub {
-        color: #ffffff !important;
-    }
-
-    .lp-hero .lp-badge {
-        color: #ffffff !important;
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .lp-hero .lp-btn-ghost {
-        color: #ffffff !important;
-        border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .lp-hero .lp-btn-ghost:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-    }
+    /* Removed forced dark background text overrides because particles now adapt to theme natively */
 
     #hero-canvas-bg,
     #hero-canvas-fg {
@@ -356,40 +339,77 @@
         padding: 3rem 5vw;
         width: 100%;
         box-sizing: border-box;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .lp-platforms {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 2rem;
+        gap: 2.5rem;
+        flex-wrap: wrap;
     }
 
     .lp-platform {
         text-align: center;
         will-change: transform;
         transition: transform .3s ease-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .lp-platform-name {
-        display: block;
-        font-size: 1.1rem;
-        font-weight: 700;
+        font-size: 1.25rem;
+        font-weight: 800;
         font-family: var(--header-font);
+        color: var(--text-0);
+        letter-spacing: -0.02em;
     }
 
-    .lp-platform-detail {
-        display: block;
-        font-size: .75rem;
+    .lp-platform-techs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        font-size: 0.75rem;
         color: var(--text-2);
         font-family: var(--mono-text-font);
-        margin-top: .2rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .lp-platform-techs span::after {
+        content: '·';
+        margin-left: 0.5rem;
+        opacity: 0.5;
+    }
+
+    .lp-platform-techs span:last-child::after {
+        content: '';
     }
 
     .lp-platform-divider {
         width: 1px;
-        height: 36px;
+        height: 48px;
         background: var(--border-color);
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .lp-platforms {
+            gap: 3rem;
+            flex-direction: column;
+        }
+
+        .lp-platform-divider {
+            display: none;
+        }
+
+        .lp-platform-techs {
+            max-width: 240px;
+        }
     }
 
     /* ===== SHOWCASE ===== */
@@ -408,7 +428,8 @@
         transition: transform .3s ease-out, box-shadow .3s ease;
         max-width: 1600px;
         margin: 0 auto;
-        position: relative;
+        display: flex;
+        flex-direction: column;
     }
 
     /* Ambient top highlight edge */
@@ -438,16 +459,28 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        padding: 12px 16px;
-        background: rgba(var(--bg-1-rgb, 30, 30, 35), 0.65);
-        backdrop-filter: blur(24px) saturate(150%);
-        -webkit-backdrop-filter: blur(24px) saturate(150%);
+        padding: 10px 16px;
+        background: var(--bg-1);
         border-bottom: 1px solid var(--border-color);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
+        position: relative;
         z-index: 5;
+        flex-shrink: 0;
+    }
+
+    :root.dark {
+        --bg-1-rgb: 30, 30, 35;
+        --primary-color-rgb: 239, 83, 80;
+        --dot-inactive-bg: rgba(255, 255, 255, 0.4);
+        --dot-hover-bg: rgba(255, 255, 255, 0.8);
+        --dot-active-bg: #ffffff;
+    }
+
+    :root.light {
+        --bg-1-rgb: 245, 245, 247;
+        --primary-color-rgb: 239, 83, 80;
+        --dot-inactive-bg: rgba(0, 0, 0, 0.2);
+        --dot-hover-bg: rgba(0, 0, 0, 0.4);
+        --dot-active-bg: var(--primary-color);
     }
 
     /* Support fallback for browsers without backdrop-filter */
@@ -522,6 +555,7 @@
         min-height: 200px;
         background: #000;
         /* Deep backdrop for images */
+        flex: 1;
     }
 
     .lp-showcase-slide {
@@ -556,7 +590,30 @@
         /* Maintain ratio without clipping */
         display: block;
         margin: 0 auto;
-        /* Image sits flush against bottom, bar overlays top */
+    }
+
+    /* === Gallery Footer Link === */
+    .lp-showcase-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+    .lp-showcase-footer a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-2);
+        text-decoration: none;
+        transition: color 0.2s ease, gap 0.3s cubic-bezier(.16, 1, .3, 1);
+        border-bottom: none !important;
+    }
+
+    .lp-showcase-footer a:hover {
+        color: var(--primary-color) !important;
+        gap: 0.7rem;
+        background: transparent !important;
     }
 
     .lp-showcase-nav {
@@ -567,11 +624,11 @@
         display: flex;
         gap: 8px;
         padding: 8px 12px;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(var(--bg-1-rgb), 0.8);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
         border-radius: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
         z-index: 10;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
@@ -884,10 +941,6 @@
     }
 
     /* ===== CUSTOM MAGNETIC CURSOR ===== */
-    body {
-        /* Hide default cursor on desktop when our custom one is active */
-        cursor: none;
-    }
 
     .custom-cursor {
         position: fixed;
@@ -1021,6 +1074,116 @@
         margin: 2px auto 0;
     }
 
+    /* ===== ARCHITECTURE DIAGRAM (Hub & Spoke) ===== */
+    .lp-arch-diagram {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem 1rem;
+        width: 100%;
+    }
+
+    .lp-arch-hub {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: var(--bg-1);
+        border: 2px solid #d89e24;
+        color: #d89e24;
+        box-shadow: 0 0 0 8px rgba(216, 158, 36, 0.1), 0 0 30px rgba(216, 158, 36, 0.15);
+        animation: arch-pulse 3s ease-in-out infinite;
+        text-align: center;
+        gap: 0.15rem;
+        flex-shrink: 0;
+    }
+
+    @keyframes arch-pulse {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 8px rgba(216, 158, 36, 0.1), 0 0 30px rgba(216, 158, 36, 0.15);
+        }
+
+        50% {
+            box-shadow: 0 0 0 14px rgba(216, 158, 36, 0.05), 0 0 50px rgba(216, 158, 36, 0.25);
+        }
+    }
+
+    .lp-arch-hub-label {
+        font-size: 0.7rem;
+        font-weight: 800;
+        font-family: var(--header-font);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        line-height: 1.2;
+    }
+
+    .lp-arch-hub-sub {
+        font-size: 0.65rem;
+        font-family: var(--mono-text-font);
+        opacity: 0.7;
+    }
+
+    .lp-arch-spokes {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .lp-arch-spoke {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .lp-arch-line {
+        width: 1px;
+        height: 24px;
+        background: linear-gradient(to bottom, #d89e24, var(--border-color));
+        opacity: 0.6;
+    }
+
+    .lp-arch-chip {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.15rem;
+        padding: 0.6rem 1rem;
+        background: var(--bg-1);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        font-family: var(--header-font);
+        transition: all 0.3s cubic-bezier(.16, 1, .3, 1);
+        width: 100%;
+        text-align: center;
+    }
+
+    .lp-arch-chip:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+    }
+
+    .lp-arch-chip-name {
+        color: var(--text-0);
+    }
+
+    .lp-arch-chip-bind {
+        font-size: 0.65rem;
+        font-family: var(--mono-text-font);
+        color: var(--text-2);
+        font-weight: 500;
+    }
+
     /* ===== EXPLORE ===== */
     .lp-explore {
         display: grid;
@@ -1029,7 +1192,9 @@
     }
 
     .lp-explore-card {
-        background: rgba(var(--bg-1-rgb, 25, 25, 30), 0.65);
+        background: var(--bg-1);
+        /* Fallback */
+        background: rgba(var(--bg-1-rgb), 0.7);
         backdrop-filter: blur(24px) saturate(150%);
         -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
@@ -1056,7 +1221,7 @@
         border-color: var(--primary-color);
         transform: translateY(-6px) !important;
         color: inherit !important;
-        background: rgba(var(--bg-1-rgb, 35, 35, 45), 0.85) !important;
+        background: rgba(var(--bg-1-rgb), 0.9) !important;
     }
 
     :root.dark .lp-explore-card:hover {
@@ -1113,7 +1278,8 @@
     }
 
     .lp-col-card {
-        background: rgba(var(--bg-1-rgb, 20, 20, 25), 0.6);
+        background: var(--bg-1);
+        background: rgba(var(--bg-1-rgb), 0.6);
         backdrop-filter: blur(24px) saturate(150%);
         -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
@@ -1133,7 +1299,7 @@
     }
 
     :root.light .lp-col-card {
-        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8), 0 8px 24px rgba(0, 0, 0, .06);
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, .06);
     }
 
     .lp-col-header {
@@ -1214,12 +1380,13 @@
         text-decoration: none;
         border-top: 1px solid var(--border-color);
         border-bottom: none !important;
-        background: rgba(0, 0, 0, 0.1);
-        transition: background .2s ease;
+        background: rgba(var(--bg-1-rgb), 0.3);
+        transition: all .2s ease;
     }
 
     .lp-col-footer:hover {
-        background: rgba(var(--primary-color-rgb, 255, 255, 255), 0.05) !important;
+        background: rgba(var(--primary-color-rgb, 239, 83, 80), 0.1) !important;
+        padding-left: 1.75rem;
     }
 
     .lp-loading {
@@ -1263,29 +1430,45 @@
     .lp-community-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 1.5rem;
-        margin-top: 3rem;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .lp-community-block {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         text-align: center;
-        gap: 1.25rem;
-        padding: 2rem;
-        background: rgba(var(--bg-1-rgb, 20, 20, 25), 0.6);
+        gap: 1rem;
+        padding: 1.5rem 1.5rem;
+        background: var(--bg-1);
+        /* Fallback */
+        background: rgba(var(--bg-1-rgb), 0.6);
         backdrop-filter: blur(24px) saturate(150%);
         -webkit-backdrop-filter: blur(24px) saturate(150%);
         border: 1px solid var(--border-color);
-        border-radius: 16px;
+        border-radius: 20px;
         text-decoration: none;
         color: inherit;
-        transition: all 0.3s cubic-bezier(.16, 1, .3, 1);
+        transition: all 0.4s cubic-bezier(.16, 1, .3, 1);
         position: relative;
         overflow: hidden;
-        will-change: transform;
         box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 1024px) {
+        .lp-community-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+        }
+
+        .lp-community-block {
+            padding: 1.25rem 1.5rem;
+        }
     }
 
     @supports not (backdrop-filter: blur(24px)) {
@@ -1364,10 +1547,13 @@
     /* ===== CTA ===== */
     .lp-cta {
         text-align: center;
-        max-width: 700px;
+        max-width: 1200px;
+        margin: 0 auto;
         position: relative;
         overflow: hidden;
-        padding-bottom: 3rem;
+        /* Override .lp-section's 6rem padding to keep everything in-viewport */
+        padding-top: 3rem !important;
+        padding-bottom: 2rem !important;
     }
 
     .lp-cta-glow {
@@ -1389,17 +1575,17 @@
     }
 
     .lp-cta-inner h2 {
-        font-size: 2rem;
+        font-size: 1.75rem;
         font-weight: 800;
         font-family: var(--header-font);
         letter-spacing: -.02em;
-        margin: 0 0 .5rem;
+        margin: 0 0 .35rem;
     }
 
     .lp-cta-inner p {
-        font-size: 1rem;
+        font-size: .95rem;
         color: var(--text-2);
-        margin: 0 0 1.75rem;
+        margin: 0 0 0;
         line-height: 1.6;
     }
 
@@ -1468,7 +1654,7 @@
             /* Much wider on mobile */
             width: 85vw;
             padding: 2rem;
-            scroll-snap-align: center;
+            /* GSAP handles scroll position now */
         }
 
         .lp-features-header {
@@ -1490,14 +1676,7 @@
             width: 100%;
             padding: 2rem 1.25rem;
             transform: scale(1) !important;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-        }
-
-        .lp-features-track::-webkit-scrollbar {
-            display: none;
+            overflow: hidden;
         }
 
         .lp-pillars {
@@ -1532,6 +1711,33 @@
         .lp-cta-links {
             flex-direction: column;
             align-items: center;
+        }
+
+        /* Keep 3-col community grid on mobile so entire CTA fits in one viewport */
+        .lp-community-grid {
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 100%;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .lp-community-block {
+            padding: 1rem 0.75rem;
+            gap: 0.5rem;
+            border-radius: 14px;
+        }
+
+        .lp-community-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .lp-community-content h3 {
+            font-size: 0.85rem;
+        }
+
+        .lp-community-content p {
+            font-size: 0.75rem;
         }
     }
 

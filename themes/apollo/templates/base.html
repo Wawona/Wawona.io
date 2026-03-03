@@ -41,6 +41,16 @@
 
     <!-- SPA Router Script -->
     <script>
+        // Mobile hamburger menu toggle (global — works on every page)
+        let _menuInterlock = false;
+        window.toggleMobileMenu = function () {
+            if (_menuInterlock) return;
+            _menuInterlock = true;
+            const nav = document.querySelector('.right-nav');
+            if (nav) nav.classList.toggle('active');
+            setTimeout(() => { _menuInterlock = false; }, 400);
+        };
+
         // On-page highlighter for search results
         function highlightOnPage() {
             const params = new URLSearchParams(window.location.search);
@@ -140,6 +150,7 @@
                     if (window.initCodeBlocks) window.initCodeBlocks();
                     if (window.initTOC) window.initTOC();
                     if (window.initNotes) window.initNotes();
+                    if (window.initMermaid) window.initMermaid();
 
                     // Check banner state post-navigation
                     const banner = document.getElementById("donationBanner");
@@ -186,6 +197,7 @@
                     if (window.initCodeBlocks) window.initCodeBlocks();
                     if (window.initTOC) window.initTOC();
                     if (window.initNotes) window.initNotes();
+                    if (window.initMermaid) window.initMermaid();
 
                     // Check banner state post-navigation
                     const banner = document.getElementById("donationBanner");

@@ -4,9 +4,6 @@
 
 <!-- HERO (Cinematic WebGL) -->
 <section class="lp-hero" id="hero-section">
-    <!-- WebGL Canvas Background -->
-    <canvas id="hero-canvas-bg"></canvas>
-
     <div class="lp-hero-content" id="hero-content">
         <div class="lp-badge lp-hero-anim">Free &amp; Open Source &middot; MIT License &middot; v0.2</div>
         <h1 class="lp-hero-title lp-hero-anim">
@@ -31,21 +28,31 @@
                 </svg> View Source</a>
         </div>
     </div>
-    <!-- WebGL Canvas Foreground -->
-    <canvas id="hero-canvas-fg"></canvas>
 </section>
 
 <!-- PLATFORMS -->
 <section class="lp-section lp-platforms-strip lp-reveal">
     <div class="lp-platforms">
-        <div class="lp-platform" data-mouse-track="8"><span class="lp-platform-name">macOS</span><span
-                class="lp-platform-detail">Metal &middot; Quartz &middot; AppKit</span></div>
+        <div class="lp-platform" data-mouse-track="8">
+            <span class="lp-platform-name">macOS</span>
+            <div class="lp-platform-techs">
+                <span>Metal</span><span>Quartz</span><span>AppKit</span>
+            </div>
+        </div>
         <div class="lp-platform-divider"></div>
-        <div class="lp-platform" data-mouse-track="8"><span class="lp-platform-name">iOS</span><span
-                class="lp-platform-detail">Metal &middot; UIKit</span></div>
+        <div class="lp-platform" data-mouse-track="8">
+            <span class="lp-platform-name">iOS</span>
+            <div class="lp-platform-techs">
+                <span>Metal</span><span>UIKit</span>
+            </div>
+        </div>
         <div class="lp-platform-divider"></div>
-        <div class="lp-platform" data-mouse-track="8"><span class="lp-platform-name">Android</span><span
-                class="lp-platform-detail">Vulkan &middot; JNI &middot; Kotlin</span></div>
+        <div class="lp-platform" data-mouse-track="8">
+            <span class="lp-platform-name">Android</span>
+            <div class="lp-platform-techs">
+                <span>Vulkan</span><span>JNI</span><span>Kotlin</span>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -76,6 +83,9 @@
         <div class="lp-showcase-nav"><button class="lp-showcase-dot active" data-index="0"></button><button
                 class="lp-showcase-dot" data-index="1"></button><button class="lp-showcase-dot"
                 data-index="2"></button><button class="lp-showcase-dot" data-index="3"></button></div>
+    </div>
+    <div class="lp-showcase-footer">
+        <a href="/gallery/">View Gallery &rarr;</a>
     </div>
 </section>
 
@@ -144,14 +154,41 @@
                         identically across all host environments.</p>
                 </div>
                 <div class="lp-feature-visual">
-                    <div class="mermaid">
-                        graph TD
-                        C(("Wawona Core Rust")) -->|UniFFI| M[macOS/Swift]
-                        C -->|UniFFI| I[iOS/Swift]
-                        C -->|FFI| L[Linux/Wayland]
-                        C -->|FFI| A[Android/Kotlin]
-
-                        style C fill:#d89e24,stroke:#fff,stroke-width:2px,color:#000
+                    <div class="lp-arch-diagram">
+                        <div class="lp-arch-hub">
+                            <span class="lp-arch-hub-label">Wawona Core</span>
+                            <span class="lp-arch-hub-sub">Rust</span>
+                        </div>
+                        <div class="lp-arch-spokes">
+                            <div class="lp-arch-spoke">
+                                <div class="lp-arch-line"></div>
+                                <div class="lp-arch-chip">
+                                    <span class="lp-arch-chip-name">macOS</span>
+                                    <span class="lp-arch-chip-bind">UniFFI</span>
+                                </div>
+                            </div>
+                            <div class="lp-arch-spoke">
+                                <div class="lp-arch-line"></div>
+                                <div class="lp-arch-chip">
+                                    <span class="lp-arch-chip-name">iOS</span>
+                                    <span class="lp-arch-chip-bind">UniFFI</span>
+                                </div>
+                            </div>
+                            <div class="lp-arch-spoke">
+                                <div class="lp-arch-line"></div>
+                                <div class="lp-arch-chip">
+                                    <span class="lp-arch-chip-name">Linux</span>
+                                    <span class="lp-arch-chip-bind">Wayland</span>
+                                </div>
+                            </div>
+                            <div class="lp-arch-spoke">
+                                <div class="lp-arch-line"></div>
+                                <div class="lp-arch-chip">
+                                    <span class="lp-arch-chip-name">Android</span>
+                                    <span class="lp-arch-chip-bind">FFI / JNI</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

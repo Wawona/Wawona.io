@@ -22,48 +22,17 @@ Wawona is a **Rust-first, cross-platform Wayland compositor**. All compositor lo
 
 ## High-Level Flow
 
-```
-┌──────────────────────┐
-│   Native OS Events   │
-│  NSEvent / UIEvent / │
-│    MotionEvent       │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│   Native Frontend    │
-│  Obj-C / Swift /     │
-│  Kotlin              │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│     FFI Layer        │
-│  src/ffi/* (UniFFI)  │
-│  inject_key,         │
-│  inject_pointer,     │
-│  process_events      │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│   Rust Core          │
-│  src/core/*          │
-│  Wayland protocols,  │
-│  surfaces, windows,  │
-│  input, frame timing │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│   RenderScene        │
-│  get_render_scene()  │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│  Native Renderer     │
-│  Metal / Vulkan      │
-└─────────┬────────────┘
-          ▼
-┌──────────────────────┐
-│   Display Output     │
-└──────────────────────┘
+```mermaid
+flowchart TD
+    A["Native OS Events\n(NSEvent / UIEvent / MotionEvent)"]
+    B["Native Frontend\n(Obj-C / Swift / Kotlin)"]
+    C["FFI Layer — src/ffi/* (UniFFI)\ninject_key · inject_pointer · process_events"]
+    D["Rust Core — src/core/*\nWayland protocols, surfaces, windows\ninput, frame timing"]
+    E["RenderScene\nget_render_scene()"]
+    F["Native Renderer\n(Metal / Vulkan)"]
+    G["Display Output"]
+
+    A --> B --> C --> D --> E --> F --> G
 ```
 
 ---
@@ -169,25 +138,13 @@ For detailed implementation status per protocol, see [Protocols](/docs/protocols
 
 ## Threading Model
 
-```
-┌─────────────────────┐
-│    Input Thread      │
-│  Receive OS events   │
-│  Translate via FFI   │
-└─────────┬───────────┘
-          ▼
-┌─────────────────────┐
-│    Core Thread       │
-│  Rust state update   │
-│  Scene graph build   │
-│  Damage tracking     │
-└─────────┬───────────┘
-          ▼
-┌─────────────────────┐
-│   Render Thread      │
-│  Metal / Vulkan draw │
-│  Present to display  │
-└─────────────────────┘
+```mermaid
+flowchart TD
+    T1["Input Thread\nReceive OS events · Translate via FFI"]
+    T2["Core Thread\nRust state update · Scene graph build · Damage tracking"]
+    T3["Render Thread\nMetal / Vulkan draw · Present to display"]
+
+    T1 --> T2 --> T3
 ```
 
 ---

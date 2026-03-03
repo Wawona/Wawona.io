@@ -238,4 +238,124 @@
     <script defer src="{{ get_url(path='js/fzf.umd.min.js', cachebust=true) | safe }}"></script>
     <script defer src="{{ get_url(path='js/searchFZF.js', cachebust=true) | safe }}"></script>
     {%- endif -%}
+
+    {# Mermaid.js diagram rendering — loaded globally for docs/blog pages #}
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        /**
+         * Read a CSS variable from :root and return its resolved value.
+         * mermaid themeVariables don't support var() references, so we do this.
+         */
+        function cssVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        /**
+         * Build a mermaid config whose themeVariables mirror the site's CSS custom
+         * properties, giving diagrams the exact same palette as the current dark/light theme.
+         */
+        function buildMermaidConfig() {
+            const bg0 = cssVar('--bg-0') || '#121212';
+            const bg1 = cssVar('--bg-1') || '#1c1c1c';
+            const bg2 = cssVar('--bg-2') || '#2b2b2b';
+            const text0 = cssVar('--text-0') || '#dedede';
+            const text2 = cssVar('--text-2') || '#7a7a7a';
+            const border = cssVar('--border-color') || bg2;
+            const accent = cssVar('--primary-color') || '#ef5350';
+            return {
+                startOnLoad: false,
+                theme: 'base',
+                flowchart: { curve: 'basis', useMaxWidth: true },
+                securityLevel: 'loose',
+                themeVariables: {
+                    background: bg0,
+                    mainBkg: bg1,
+                    secondBkg: bg2,
+                    nodeBorder: accent,
+                    clusterBkg: bg1,
+                    primaryTextColor: text0,
+                    secondaryTextColor: text2,
+                    tertiaryTextColor: text2,
+                    lineColor: border,
+                    edgeLabelBackground: bg1,
+                    primaryColor: bg1,
+                    primaryBorderColor: accent,
+                    secondaryColor: bg2,
+                    tertiaryColor: bg2,
+                    titleColor: text0,
+                },
+            };
+        }
+
+        /**
+         * Find all mermaid code blocks in the page and render them.
+         * Zola renders ```mermaid fences as <pre><code class="language-mermaid">.
+         * We replace each such block with a rendered SVG.
+         */
+        async function initMermaid() {
+            mermaid.initialize(buildMermaidConfig());
+
+            // On theme toggle: restore raw <pre><code> blocks previously replaced so we
+            // can re-render them with the new palette.
+            document.querySelectorAll('.mermaid-wrapper[data-source]').forEach(wrapper => {
+                const pre = document.createElement('pre');
+                const code = document.createElement('code');
+                code.setAttribute('data-lang', 'mermaid');
+                code.textContent = wrapper.dataset.source;
+                pre.appendChild(code);
+                wrapper.replaceWith(pre);
+            });
+
+            // Apollo theme: data-lang="mermaid". Standard Zola: class="language-mermaid"
+            const codeBlocks = document.querySelectorAll(
+                'pre code.language-mermaid, pre code[data-lang="mermaid"]'
+            );
+            let idx = 0;
+            for (const code of codeBlocks) {
+                const pre = code.parentElement;
+                const graphDefinition = code.textContent;
+                const id = 'mermaid-diagram-' + Date.now() + '-' + (idx++);
+                try {
+                    const { svg } = await mermaid.render(id, graphDefinition);
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'mermaid-wrapper';
+                    wrapper.dataset.source = graphDefinition; // for re-render on theme toggle
+                    wrapper.innerHTML = svg;
+                    pre.replaceWith(wrapper);
+                } catch (err) {
+                    console.warn('[Mermaid] Failed to render diagram:', err);
+                }
+            }
+        }
+
+        // Expose globally so the SPA router can call it after each navigation
+        window.initMermaid = initMermaid;
+
+        // Run on first full page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMermaid);
+        } else {
+            initMermaid();
+        }
+
+        // Re-run when the theme changes (listens for class mutations on <html>)
+        const themeObserver = new MutationObserver(() => initMermaid());
+        themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    </script>
+
+    <style>
+        /* ── Mermaid diagram container ─────────────────────────────────── */
+        .mermaid-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+
+        .mermaid-wrapper svg {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+    </style>
 </head>

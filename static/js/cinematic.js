@@ -3,33 +3,35 @@
  * Powered by Lenis, GSAP, and Three.js
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (window._cinematicInitialized) return;
-    window._cinematicInitialized = true;
+function runCinematicSetup() {
+    // Only run if we actually have a hero section on this page
+    if (!document.getElementById('hero-section')) return;
 
-    // 1. Initialize Lenis for Smooth Scrolling
-    const lenis = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // https://www.desmos.com/calculator/brs54l4xou
-        direction: 'vertical',
-        gestureDirection: 'vertical',
-        smooth: true,
-        mouseMultiplier: 1,
-        smoothTouch: false,
-        touchMultiplier: 2,
-        infinite: false,
-    });
+    // 1. Initialize Lenis for Smooth Scrolling ONLY ONCE globally
+    if (!window._cinematicLenis) {
+        window._cinematicLenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+            touchMultiplier: 2,
+            infinite: false,
+        });
 
-    // 2. Integrate Lenis with GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
+        // 2. Integrate Lenis with GSAP ScrollTrigger
+        window._cinematicLenis.on('scroll', ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
-        lenis.raf(time * 1000);
-    });
+        gsap.ticker.add((time) => {
+            window._cinematicLenis.raf(time * 1000);
+        });
 
-    gsap.ticker.lagSmoothing(0);
+        gsap.ticker.lagSmoothing(0);
+    }
 
-    // 3. Three.js Hero Particle Canvas
+    // 3. Three.js Hero Particle Canvas (Handles its own caching)
     initHeroWebGL();
 
     // 4. GSAP Hero Entry Animations
@@ -42,18 +44,64 @@ document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();
 
     console.log("Cinematic Experience Initialized");
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runCinematicSetup);
+} else {
+    runCinematicSetup();
+}
+
+// --- Navigation & SPA Logic ---
+// Note: window.toggleMobileMenu is defined in base.html for global availability
+
+// Prevent re-rendering/flashing when clicking a link to the current page
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+
+    const url = new URL(link.href, window.location.origin);
+    if (url.origin === window.location.origin && url.pathname === window.location.pathname && url.hash === window.location.hash) {
+        // We are already here!
+        // If it's the home page, we might want to scroll to top instead of doing nothing
+        if (url.pathname === '/' || url.pathname === '/index.html') {
+            if (window._cinematicLenis) {
+                window._cinematicLenis.scrollTo(0);
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Close menu if it's open
+        const nav = document.querySelector('.right-nav');
+        if (nav && nav.classList.contains('active')) {
+            window.toggleMobileMenu();
+        }
+
+        e.preventDefault();
+    }
 });
 
 // --- Custom Magnetic Cursor ---
 function initCustomCursor() {
     if (window.matchMedia('(pointer: coarse)').matches) return; // Skip on touch devices
 
+    // Cleanup old cursor if it exists from SPA routing
+    if (document.querySelector('.custom-cursor')) {
+        document.querySelector('.custom-cursor').remove();
+    }
+
     const cursor = document.createElement('div');
     cursor.classList.add('custom-cursor');
+    // Start hidden, only show in hero
+    cursor.style.opacity = '0';
     document.body.appendChild(cursor);
 
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
+    const heroSection = document.getElementById('hero-section');
+
+    if (!heroSection) return;
 
     // Follow mouse
     window.addEventListener('mousemove', (e) => {
@@ -67,10 +115,37 @@ function initCustomCursor() {
         });
     });
 
-    // Hover states for links and buttons
-    const interactiveElements = document.querySelectorAll('a, button, .lp-btn');
+    // Only show cursor when inside hero section
+    heroSection.addEventListener('mouseenter', () => {
+        gsap.to(cursor, { opacity: 1, duration: 0.3 });
+        // Hide default cursor in hero
+        heroSection.style.cursor = 'none';
 
+        // Hide cursor on interactive elements in hero too
+        const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
+        interactiveElements.forEach(el => {
+            el.style.cursor = 'none';
+        });
+    });
+
+    heroSection.addEventListener('mouseleave', () => {
+        gsap.to(cursor, { opacity: 0, duration: 0.3 });
+        cursor.classList.remove('is-hovering');
+        // Restore default cursor outside hero
+        heroSection.style.cursor = 'auto';
+
+        const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
+        interactiveElements.forEach(el => {
+            el.style.cursor = 'pointer';
+        });
+    });
+
+    // Hover states for links and buttons ONLY within the hero section
+    const interactiveElements = heroSection.querySelectorAll('a, button, .lp-btn');
     interactiveElements.forEach(el => {
+        // Initial setup for the elements inside the hero so they don't show the default pointer
+        el.style.cursor = 'none';
+
         el.addEventListener('mouseenter', () => {
             cursor.classList.add('is-hovering');
         });
@@ -89,124 +164,136 @@ function initHorizontalScroll() {
 
     if (!wrapper || !track || cards.length === 0 || !window.gsap) return;
 
-    // Use MatchMedia to completely disable horizontal pinned scrollytelling on mobile
-    let mm = gsap.matchMedia();
+    cards.forEach((c, i) => {
+        if (i === 0) {
+            gsap.set(c, { opacity: 1, scale: 1 });
+        } else {
+            gsap.set(c, { opacity: 0.15, scale: 0.9 });
+        }
+    });
 
-    mm.add("(min-width: 769px)", () => {
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            trigger: wrapper,
+            start: "top top",
+            // Add an extra 2 screens of scrolling distance to account for our huge deadzones,
+            // so panning between cards still feels 1:1 with track size
+            end: () => `+=${track.scrollWidth + (window.innerHeight * 2)}`,
+            pin: true,
+            scrub: 1.5,
+            snap: {
+                snapTo: "labels",
+                duration: { min: 0.3, max: 0.8 },
+                ease: "power2.inOut",
+                delay: 0.1
+            },
+            invalidateOnRefresh: true
+        }
+    });
+
+    // Start label: deadzone before moving
+    // Huge pause (absorbs 1 full screen of scrolling)
+    tl.addLabel("card0");
+    tl.to({}, { duration: 3.0 });
+
+    for (let i = 1; i < cards.length; i++) {
+        tl.to(track, {
+            x: () => {
+                const cardLeft = cards[i].offsetLeft;
+                // Align to 5vw margin to match the "The Architecture" header perfectly
+                const leftAlignOffset = window.innerWidth * 0.05;
+
+                return -(cardLeft - leftAlignOffset);
+            },
+            ease: "none",
+            duration: 1
+        });
+
+        // Exact left-aligned label
+        tl.addLabel(`card${i}`);
+
+        // Pause at label to hold focus over scroll
+        if (i === cards.length - 1) {
+            // Huge pause for the very last card (absorbs 1 full screen of scrolling)
+            tl.to({}, { duration: 3.0 });
+        } else {
+            // Tiny pause to help snapping between middle cards
+            tl.to({}, { duration: 0.35 });
+        }
+    }
+
+    // Dynamic fade-in/out scale depending on closest card perfectly aligned with scroll tracking
+    tl.eventCallback("onUpdate", () => {
+
+        let closestIndex = 0;
+        let minDistance = Infinity;
+
+        // trackX represents raw horizontal movement distance backwards. e.g. 0 to -3000px
+        const currentScrollX = gsap.getProperty(track, "x") || 0;
+
+        cards.forEach((card, i) => {
+            // Evaluates mathematical perfect alignment of this card matching 5vw padding left
+            const perfectAlignScrollX = -(card.offsetLeft - (window.innerWidth * 0.05));
+
+            // Distance from where we are currently scrubbed vs where we need to be to center this card
+            let scrubDistance = currentScrollX - perfectAlignScrollX;
+            let absDistance = Math.abs(scrubDistance);
+
+            // The bias math: If the user hasn't physically reached the card yet (scrubDistance > 0),
+            // manually shrink its distance constraint early, allowing it to mathematically win focus much sooner 
+            // than halfway. 
+            if (scrubDistance > 0) {
+                // Bias of 350px - the card wakes up extremely early!
+                absDistance = Math.max(0, absDistance - 350);
+            }
+
+            if (absDistance < minDistance) {
+                minDistance = absDistance;
+                closestIndex = i;
+            }
+        });
 
         cards.forEach((c, i) => {
-            if (i === 0) {
-                gsap.set(c, { opacity: 1, scale: 1 });
+            if (i === closestIndex) {
+                // Active leftmost card: crisp, glowing, full size (Removed blur per user request)
+                gsap.to(c, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
             } else {
-                gsap.set(c, { opacity: 0.15, scale: 0.9 });
+                // Inactive cards deeply recede 
+                gsap.to(c, { opacity: 0.15, scale: 0.9, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
             }
         });
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: wrapper,
-                start: "top top",
-                // Add an extra 2 screens of scrolling distance to account for our huge deadzones,
-                // so panning between cards still feels 1:1 with track size
-                end: () => `+=${track.scrollWidth + (window.innerHeight * 2)}`,
-                pin: true,
-                scrub: 1.5,
-                snap: {
-                    snapTo: "labels",
-                    duration: { min: 0.3, max: 0.8 },
-                    ease: "power2.inOut",
-                    delay: 0.1
-                },
-                invalidateOnRefresh: true
-            }
-        });
-
-        // Start label: deadzone before moving
-        // Huge pause (absorbs 1 full screen of scrolling)
-        tl.addLabel("card0");
-        tl.to({}, { duration: 3.0 });
-
-        for (let i = 1; i < cards.length; i++) {
-            tl.to(track, {
-                x: () => {
-                    const cardLeft = cards[i].offsetLeft;
-                    // Align to 5vw margin to match the "The Architecture" header perfectly
-                    const leftAlignOffset = window.innerWidth * 0.05;
-
-                    return -(cardLeft - leftAlignOffset);
-                },
-                ease: "none",
-                duration: 1
-            });
-
-            // Exact left-aligned label
-            tl.addLabel(`card${i}`);
-
-            // Pause at label to hold focus over scroll
-            if (i === cards.length - 1) {
-                // Huge pause for the very last card (absorbs 1 full screen of scrolling)
-                tl.to({}, { duration: 3.0 });
-            } else {
-                // Tiny pause to help snapping between middle cards
-                tl.to({}, { duration: 0.35 });
-            }
-        }
-
-        // Dynamic fade-in/out scale depending on closest card perfectly aligned with scroll tracking
-        tl.eventCallback("onUpdate", () => {
-
-            let closestIndex = 0;
-            let minDistance = Infinity;
-
-            // trackX represents raw horizontal movement distance backwards. e.g. 0 to -3000px
-            const currentScrollX = gsap.getProperty(track, "x") || 0;
-
-            cards.forEach((card, i) => {
-                // Evaluates mathematical perfect alignment of this card matching 5vw padding left
-                const perfectAlignScrollX = -(card.offsetLeft - (window.innerWidth * 0.05));
-
-                // Distance from where we are currently scrubbed vs where we need to be to center this card
-                let scrubDistance = currentScrollX - perfectAlignScrollX;
-                let absDistance = Math.abs(scrubDistance);
-
-                // The bias math: If the user hasn't physically reached the card yet (scrubDistance > 0),
-                // manually shrink its distance constraint early, allowing it to mathematically win focus much sooner 
-                // than halfway. 
-                if (scrubDistance > 0) {
-                    // Bias of 350px - the card wakes up extremely early!
-                    absDistance = Math.max(0, absDistance - 350);
-                }
-
-                if (absDistance < minDistance) {
-                    minDistance = absDistance;
-                    closestIndex = i;
-                }
-            });
-
-            cards.forEach((c, i) => {
-                if (i === closestIndex) {
-                    // Active leftmost card: crisp, glowing, full size (Removed blur per user request)
-                    gsap.to(c, { opacity: 1, scale: 1, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
-                } else {
-                    // Inactive cards deeply recede 
-                    gsap.to(c, { opacity: 0.15, scale: 0.9, duration: 0.4, ease: 'power2.out', overwrite: "auto" });
-                }
-            });
-        });
-
-        // Cleanup function for when MatchMedia context is destroyed (mobile sizing)
-        return () => {
-            gsap.set(cards, { clearProps: "all" });
-        };
     });
 }
 
 
 // --- WebGL Hero Background ---
+let _heroRendererBG, _heroRendererFG;
+
 function initHeroWebGL() {
-    const canvasBG = document.getElementById('hero-canvas-bg');
-    const canvasFG = document.getElementById('hero-canvas-fg');
-    if (!canvasBG || !canvasFG || !window.THREE) return;
+    const heroSection = document.getElementById('hero-section');
+    if (!heroSection) return;
+
+    // Check if we already initialized WebGL. If so, just re-append the cached canvases and return.
+    if (_heroRendererBG && _heroRendererFG) {
+        if (!document.getElementById('hero-canvas-bg')) {
+            heroSection.insertBefore(_heroRendererBG.domElement, heroSection.firstChild);
+        }
+        if (!document.getElementById('hero-canvas-fg')) {
+            heroSection.appendChild(_heroRendererFG.domElement);
+        }
+        return;
+    }
+
+    if (!window.THREE) return;
+
+    // Create the canvases dynamically so we own them
+    const canvasBG = document.createElement('canvas');
+    canvasBG.id = 'hero-canvas-bg';
+    heroSection.insertBefore(canvasBG, heroSection.firstChild);
+
+    const canvasFG = document.createElement('canvas');
+    canvasFG.id = 'hero-canvas-fg';
+    heroSection.appendChild(canvasFG);
 
     // Use a shared single scene to ensure particles only compute rotation once
     const scene = new THREE.Scene();
@@ -234,8 +321,8 @@ function initHeroWebGL() {
         return renderer;
     }
 
-    const rendererBG = createRenderer(canvasBG);
-    const rendererFG = createRenderer(canvasFG);
+    _heroRendererBG = createRenderer(canvasBG);
+    _heroRendererFG = createRenderer(canvasFG);
 
     // Create a procedural glowing square particle texture
     function createSquareGlowTexture() {
@@ -268,7 +355,7 @@ function initHeroWebGL() {
 
     // Create a unified particle system
     const geometry = new THREE.BufferGeometry();
-    const particleCount = 8000;
+    const particleCount = 3500;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
@@ -312,28 +399,33 @@ function initHeroWebGL() {
         depthWrite: false
     });
 
-    // Custom shader injection for HDR depth brightness
+    // Custom shader injection for HDR depth brightness and alpha fading
     material.onBeforeCompile = (shader) => {
         shader.vertexShader = `
             varying float vDepth;
+            varying float vAlphaFade;
         ` + shader.vertexShader;
 
         shader.vertexShader = shader.vertexShader.replace(
             `#include <project_vertex>`,
             `#include <project_vertex>
-             vDepth = - mvPosition.z;`
+             vDepth = - mvPosition.z;
+             // Fade out particles that get too close to the screen, but keep them semi-transparent
+             vAlphaFade = mix(0.4, 1.0, smoothstep(100.0, 500.0, vDepth));`
         );
 
         shader.fragmentShader = `
             varying float vDepth;
+            varying float vAlphaFade;
         ` + shader.fragmentShader;
 
         shader.fragmentShader = shader.fragmentShader.replace(
             `#include <color_fragment>`,
             `#include <color_fragment>
              // HDR distance multiplier: particles closer than 1000 units glow vastly brighter
-             float intensity = 1.0 + max(0.0, (1100.0 - vDepth) / 200.0);
+             float intensity = 1.0 + max(0.0, (1100.0 - vDepth) / 100.0);
              diffuseColor.rgb *= intensity;
+             diffuseColor.a *= vAlphaFade;
             `
         );
     };
@@ -355,16 +447,18 @@ function initHeroWebGL() {
     });
 
     // Handle Resize
+    let lastWidth = window.innerWidth;
     window.addEventListener('resize', () => {
-        const aspect = window.innerWidth / window.innerHeight;
+        if (window.innerWidth === lastWidth) return;
+        lastWidth = window.innerWidth;
 
-        cameraBG.aspect = aspect;
+        cameraBG.aspect = window.innerWidth / window.innerHeight;
         cameraBG.updateProjectionMatrix();
-        rendererBG.setSize(window.innerWidth, window.innerHeight);
+        _heroRendererBG.setSize(window.innerWidth, window.innerHeight);
 
-        cameraFG.aspect = aspect;
+        cameraFG.aspect = window.innerWidth / window.innerHeight;
         cameraFG.updateProjectionMatrix();
-        rendererFG.setSize(window.innerWidth, window.innerHeight);
+        _heroRendererFG.setSize(window.innerWidth, window.innerHeight);
     });
 
     // Animation Loop
@@ -373,6 +467,9 @@ function initHeroWebGL() {
 
     function animate() {
         requestAnimationFrame(animate);
+
+        // If the section isn't in the DOM at all anymore, pause rendering to save battery
+        if (!document.getElementById('hero-section')) return;
 
         targetX = mouseX * 0.5;
         targetY = mouseY * 0.5;
@@ -394,8 +491,8 @@ function initHeroWebGL() {
         cameraFG.position.y = camPosY;
         cameraFG.lookAt(0, 0, 0); // Focus on origin
 
-        rendererBG.render(scene, cameraBG);
-        rendererFG.render(scene, cameraFG);
+        _heroRendererBG.render(scene, cameraBG);
+        _heroRendererFG.render(scene, cameraFG);
     }
 
     animate();
@@ -403,14 +500,16 @@ function initHeroWebGL() {
     // --- Thematic Color Switching ---
     const isDarkTheme = () => document.documentElement.classList.contains('dark');
 
-    // Define the light theme alternative color multiplier
-    // A dark ruby tone multiplies with the vertex colors for better contrast on light themes
-    const baseColorWhite = new THREE.Color(0xffffff); // Default
-    const lightColorTint = new THREE.Color(0x990011);
+    // On dark theme: brilliant white and saturated red glowing against black
+    const darkThemeColor = new THREE.Color(0xffffff);
+    // On light theme: sophisticated, muted ruby red glowing against white
+    const lightThemeColor = new THREE.Color(0xd12a42);
 
     // Set initial colors based on current theme state
     if (!isDarkTheme()) {
-        material.color.copy(lightColorTint);
+        material.color.copy(lightThemeColor);
+        // Slightly lower opacity for light mode
+        material.opacity = 0.85;
     }
 
     // Watch for theme toggle changes
@@ -418,10 +517,8 @@ function initHeroWebGL() {
         mutations.forEach((mutation) => {
             if (mutation.attributeName === 'class') {
                 const dark = isDarkTheme();
-                // Instantly snap the color. The 'document.startViewTransition' DOM snapshot
-                // captures this precise instant, allowing the native CSS ripple to seamlessly 
-                // reveal the brand new WebGL colors without any manual GSAP crossfading.
-                material.color.copy(dark ? baseColorWhite : lightColorTint);
+                material.color.copy(dark ? darkThemeColor : lightThemeColor);
+                material.opacity = dark ? 0.95 : 0.85;
             }
         });
     });
@@ -433,19 +530,32 @@ function initHeroWebGL() {
 function initHeroAnimations() {
     if (!window.gsap) return;
 
-    // Initial state
-    gsap.set('.lp-hero-anim', { y: 50, opacity: 0, filter: 'blur(10px)' });
+    // Check if user has already seen the animation this session
+    const isCached = sessionStorage.getItem('wawona_hero_rendered') === 'true';
 
-    // Timeline
-    const tl = gsap.timeline({ defaults: { ease: 'power4.out', duration: 1.2 } });
+    if (isCached) {
+        // Just show everything immediately with no intro delay
+        gsap.set('.lp-hero-anim', { y: 0, opacity: 1, filter: 'blur(0px)' });
+    } else {
+        // Initial state
+        gsap.set('.lp-hero-anim', { y: 50, opacity: 0, filter: 'blur(10px)' });
 
-    tl.to('.lp-hero-anim', {
-        y: 0,
-        opacity: 1,
-        filter: 'blur(0px)',
-        stagger: 0.15,
-        delay: 0.2 // Wait a beat after load
-    });
+        // Timeline
+        const tl = gsap.timeline({
+            defaults: { ease: 'power4.out', duration: 1.2 },
+            onComplete: () => {
+                sessionStorage.setItem('wawona_hero_rendered', 'true');
+            }
+        });
+
+        tl.to('.lp-hero-anim', {
+            y: 0,
+            opacity: 1,
+            filter: 'blur(0px)',
+            stagger: 0.15,
+            delay: 0.2 // Wait a beat after load
+        });
+    }
 
     // Parallax the hero content on scroll
     gsap.to('#hero-content', {
