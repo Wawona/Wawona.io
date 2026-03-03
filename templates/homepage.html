@@ -139,21 +139,19 @@
             <div class="lp-feature-card">
                 <div class="lp-feature-text">
                     <h3>Shared Rust Core</h3>
-                    <p>The heart of Wawona is a monolithic Wayland state machine. It manages socket connections,
-                        protocol globals, and event dispatching in pure Rust, providing identical logical behavior
-                        across all platforms.</p>
+                    <p>Wawona relies on a unified, high-performance compositor core written in 100% safe, concurrent
+                        Rust. This monolithic library securely orchestrates input seat management and surface rendering
+                        identically across all host environments.</p>
                 </div>
                 <div class="lp-feature-visual">
-                    <div class="lp-arch-mini">
-                        <div class="lp-arch-mini-row"><span class="lp-arch-chip">macOS</span><span
-                                class="lp-arch-chip">iOS</span><span class="lp-arch-chip">Android</span></div>
-                        <div class="lp-arch-mini-connector">UniFFI &middot; C FFI</div>
-                        <div class="lp-arch-mini-row"><span class="lp-arch-chip lp-arch-chip-core">Rust Core</span>
-                        </div>
-                        <div class="lp-arch-mini-connector">wayland-server &middot; wayland-protocols</div>
-                        <div class="lp-arch-mini-row"><span class="lp-arch-chip lp-arch-chip-dep">Native
-                                Libraries</span>
-                        </div>
+                    <div class="mermaid">
+                        graph TD
+                        C((Wawona Core <br>Rust)) --> |UniFFI| M[macOS/Swift]
+                        C --> |UniFFI| I[iOS/Swift]
+                        C --> |FFI| L[Linux/Wayland]
+                        C --> |FFI| A[Android/Kotlin]
+
+                        style C fill:#d89e24,stroke:#fff,stroke-width:2px,color:#000
                     </div>
                 </div>
             </div>
@@ -373,6 +371,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.halo.min.js"></script>
 <!-- Custom Cinematic Logic -->
 <script src="/js/cinematic.js"></script>
+
+<!-- Mermaid JS Diagram Rendering -->
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark', // Fits best with Wawona aesthetic natively
+        flowchart: { curve: 'basis' }
+    });
+</script>
 
 {% include "partials/homepage_scripts.html" %}
 
