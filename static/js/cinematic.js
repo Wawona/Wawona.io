@@ -144,9 +144,9 @@ function initHorizontalScroll() {
 
     // Dynamic fade-in/out scale depending on closest card to the LEFT of the screen
     tl.eventCallback("onUpdate", () => {
-        // Our activation line is 5vw (the left padding) + roughly half a card width
-        // to gracefully transition as the full card sweeps into the reading zone
-        const activationLine = window.innerWidth * 0.05 + 100;
+        // Our activation line is further right (35vw) so the next card unblurs 
+        // earlier as it enters the screen, rather than waiting until it reaches the left.
+        const activationLine = window.innerWidth * 0.35;
 
         let closestIndex = 0;
         let minDistance = Infinity;
