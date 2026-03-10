@@ -1,4 +1,4 @@
-base_url = "https://wawona.github.io"
+base_url = "https://wawona.io"
 title = "Wawona"
 description = "A high-performance native Wayland compositor for macOS, iOS, and Android"
 theme = "apollo"
