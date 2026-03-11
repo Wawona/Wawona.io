@@ -37,10 +37,13 @@
         <style>
             .site-footer {
                 text-align: center;
-                padding: 2.5rem 2rem;
+                padding: 2.5rem 1rem;
                 border-top: 1px solid var(--border-color);
-                max-width: 960px;
+                width: 100%;
+                max-width: var(--page-width, 920px);
                 margin: 0 auto;
+                box-sizing: border-box;
+                overflow: hidden;
             }
 
             .site-footer p {
