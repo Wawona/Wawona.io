@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 /* ===== THEME-AWARE NAVIGATION LOGO ===== */
 
 /* Default state (before JS runs): show the light logo */
