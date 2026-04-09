@@ -30,6 +30,11 @@
                 <img src="{{ get_url(path='icons/search.svg') }}" alt="Search" class="search-icon" />
             </button>
             {% endif %}
+            {% if config.generate_feeds %}
+            <button id="feed-button" class="search-button" data-hint="Feed" aria-label="Open feed options">
+                <img src="{{ get_url(path='icons/feed.svg') }}" alt="Feed" class="search-icon" />
+            </button>
+            {% endif %}
 
             {% if config.extra.theme == "toggle" %}
             <a id="dark-mode-toggle" onclick="toggleTheme(); event.preventDefault();" href="#" data-hint="Change Theme">
@@ -91,6 +96,31 @@
         </div>
     </div>
     {% endif %}
+    {% if config.generate_feeds %}
+    <div id="feedModal" class="search-modal js" role="dialog" aria-labelledby="feedModalTitle" aria-modal="true">
+        {% set base_url = config.base_url | trim_end_matches(pat="/") %}
+        <div class="feed-modal-content">
+            <h1 id="feedModalTitle" class="page-header">Subscribe to Wawona Feed</h1>
+            <p>
+                Follow the latest posts from
+                <a id="feed-posts-link" href="{{ base_url }}/posts/">{{ base_url }}/posts/</a>.
+            </p>
+            <div class="feed-url-row">
+                <label for="rss-feed-url">RSS</label>
+                <input id="rss-feed-url" type="text" readonly
+                    value="{{ base_url }}/posts/rss.xml" />
+                <button type="button" class="copy-feed-button" data-copy-target="rss-feed-url">Copy</button>
+            </div>
+            <div class="feed-url-row">
+                <label for="atom-feed-url">Atom</label>
+                <input id="atom-feed-url" type="text" readonly
+                    value="{{ base_url }}/posts/atom.xml" />
+                <button type="button" class="copy-feed-button" data-copy-target="atom-feed-url">Copy</button>
+            </div>
+            <button type="button" id="close-feed-modal" class="feed-close-button">Close</button>
+        </div>
+    </div>
+    {% endif %}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const logoBtn = document.querySelector('nav .logo');
@@ -103,6 +133,97 @@
                     logoBtn.style.setProperty('--mouse-y', `${y}px`);
                 });
             }
+
+            const feedModal = document.getElementById('feedModal');
+            const feedButton = document.getElementById('feed-button');
+            const closeFeedModalButton = document.getElementById('close-feed-modal');
+            const postsFeedLink = document.getElementById('feed-posts-link');
+            const rssFeedInput = document.getElementById('rss-feed-url');
+            const atomFeedInput = document.getElementById('atom-feed-url');
+
+            const syncAbsoluteFeedUrls = () => {
+                const origin = window.location.origin;
+                const postsUrl = `${origin}/posts/`;
+                const rssUrl = `${origin}/posts/rss.xml`;
+                const atomUrl = `${origin}/posts/atom.xml`;
+
+                if (postsFeedLink) {
+                    postsFeedLink.href = postsUrl;
+                    postsFeedLink.textContent = postsUrl;
+                }
+
+                if (rssFeedInput) {
+                    rssFeedInput.value = rssUrl;
+                }
+
+                if (atomFeedInput) {
+                    atomFeedInput.value = atomUrl;
+                }
+            };
+
+            const closeFeedModal = () => {
+                if (feedModal) {
+                    feedModal.style.display = 'none';
+                }
+            };
+
+            if (feedButton && feedModal) {
+                feedButton.addEventListener('click', () => {
+                    syncAbsoluteFeedUrls();
+                    feedModal.style.display = 'block';
+                });
+            }
+
+            syncAbsoluteFeedUrls();
+
+            if (closeFeedModalButton) {
+                closeFeedModalButton.addEventListener('click', closeFeedModal);
+            }
+
+            if (feedModal) {
+                feedModal.addEventListener('click', (event) => {
+                    if (event.target === feedModal) {
+                        closeFeedModal();
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closeFeedModal();
+                }
+            });
+
+            const copyButtons = document.querySelectorAll('.copy-feed-button');
+            copyButtons.forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const targetId = button.getAttribute('data-copy-target');
+                    if (!targetId) {
+                        return;
+                    }
+
+                    const targetInput = document.getElementById(targetId);
+                    if (!targetInput) {
+                        return;
+                    }
+
+                    const textToCopy = targetInput.value;
+                    const originalLabel = button.textContent;
+
+                    try {
+                        await navigator.clipboard.writeText(textToCopy);
+                    } catch (error) {
+                        targetInput.focus();
+                        targetInput.select();
+                        document.execCommand('copy');
+                    }
+
+                    button.textContent = 'Copied!';
+                    setTimeout(() => {
+                        button.textContent = originalLabel;
+                    }, 1200);
+                });
+            });
         });
     </script>
 </nav>

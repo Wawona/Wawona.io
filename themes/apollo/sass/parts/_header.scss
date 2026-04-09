@@ -17,6 +17,8 @@
 }
 
 nav {
+  $nav-collapse-breakpoint: 650px;
+
   position: sticky;
   top: 0;
   z-index: 100;
@@ -29,7 +31,7 @@ nav {
   justify-content: space-between;
 
   /* Mobile-specific adjustments */
-  @media (max-width: 600px) {
+  @media (max-width: $nav-collapse-breakpoint) {
     flex-direction: column;
   }
 
@@ -43,7 +45,7 @@ nav {
     justify-content: space-between;
     width: 100%;
 
-    @media (min-width: 601px) {
+    @media (min-width: $nav-collapse-breakpoint + 1px) {
       width: auto;
     }
 
@@ -86,7 +88,7 @@ nav {
     padding: 0.5rem;
     color: var(--text-0);
 
-    @media (max-width: 600px) {
+    @media (max-width: $nav-collapse-breakpoint) {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -145,7 +147,7 @@ nav {
     align-items: center;
     gap: 1.5rem;
 
-    @media (max-width: 600px) {
+    @media (max-width: $nav-collapse-breakpoint) {
       width: 100%;
       flex-direction: column;
       align-items: stretch;
