@@ -3,9 +3,30 @@
  * Powered by Lenis, GSAP, and Three.js
  */
 
+function teardownCinematicScroll() {
+    if (window.ScrollTrigger) {
+        ScrollTrigger.getAll().forEach(t => t.kill());
+    }
+
+    if (window._cinematicLenis && typeof window._cinematicLenis.destroy === 'function') {
+        window._cinematicLenis.destroy();
+    }
+    window._cinematicLenis = null;
+
+    // Remove the GSAP ticker bridge if we created one.
+    if (window._cinematicLenisTicker && window.gsap && window.gsap.ticker) {
+        window.gsap.ticker.remove(window._cinematicLenisTicker);
+    }
+    window._cinematicLenisTicker = null;
+}
+
 function runCinematicSetup() {
-    // Only run if we actually have a hero section on this page
-    if (!document.getElementById('hero-section')) return;
+    // Only run cinematic behavior if we actually have a hero section on this page.
+    if (!document.getElementById('hero-section')) {
+        // Full teardown when leaving home avoids stale Lenis bounds/state.
+        teardownCinematicScroll();
+        return;
+    }
 
     // Kill any stale GSAP ScrollTrigger instances from a previous page load
     // (critical for SPA navigation — prevents dead pinned sections from stacking)
@@ -30,11 +51,21 @@ function runCinematicSetup() {
         // 2. Integrate Lenis with GSAP ScrollTrigger
         window._cinematicLenis.on('scroll', ScrollTrigger.update);
 
-        gsap.ticker.add((time) => {
+        window._cinematicLenisTicker = (time) => {
+            if (!window._cinematicLenis) return;
             window._cinematicLenis.raf(time * 1000);
-        });
+        };
+        gsap.ticker.add(window._cinematicLenisTicker);
 
         gsap.ticker.lagSmoothing(0);
+    } else {
+        // Existing instance: refresh dimensions after SPA DOM replacement.
+        if (typeof window._cinematicLenis.resize === 'function') {
+            window._cinematicLenis.resize();
+        }
+        if (typeof window._cinematicLenis.start === 'function') {
+            window._cinematicLenis.start();
+        }
     }
 
     // 3. Three.js Hero Particle Canvas (Handles its own caching)
@@ -48,6 +79,11 @@ function runCinematicSetup() {
 
     // 6. Custom Magnetic Cursor
     initCustomCursor();
+
+    // Recalculate pin/snap metrics after SPA restore/reflow.
+    if (window.ScrollTrigger) {
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+    }
 
     console.log("Cinematic Experience Initialized");
 }

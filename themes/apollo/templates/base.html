@@ -152,13 +152,38 @@
             });
         }
 
+        // Home route has complex cinematic/ScrollTrigger lifecycle; treat it as a hard page boundary.
+        function isHomePath(pathname) {
+            const normalized = pathname.replace(/\/$/, '') || '/';
+            return normalized === '/' || normalized === '/index.html';
+        }
+
         // Restore a cached page into #spa-main and re-run all init hooks.
         function _spaRestoreFromCache(spaMain, entry, url, pushState) {
             spaMain.innerHTML = entry.html;
             document.title = entry.title;
             if (pushState) history.pushState({}, '', url);
             spaMain.style.opacity = '1';
-            window.scrollTo(0, entry.scrollY || 0);
+            // Clear stale overflow locks from previous route UI (e.g. lightboxes/modals).
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+
+            // Keep Lenis synced with the new document height after SPA swaps.
+            const routeHasCinematicHero =
+                entry.html.includes('id="hero-section"') || entry.html.includes("id='hero-section'");
+
+            if (routeHasCinematicHero && window._cinematicLenis) {
+                if (typeof window._cinematicLenis.resize === 'function') {
+                    window._cinematicLenis.resize();
+                }
+                if (typeof window._cinematicLenis.scrollTo === 'function') {
+                    window._cinematicLenis.scrollTo(entry.scrollY || 0, { immediate: true });
+                } else {
+                    window.scrollTo(0, entry.scrollY || 0);
+                }
+            } else {
+                window.scrollTo(0, entry.scrollY || 0);
+            }
             updateActiveNavLink();
             highlightOnPage();
             if (window.initCodeBlocks) window.initCodeBlocks();
@@ -247,6 +272,13 @@
 
             e.preventDefault();
             const url = link.href;
+            const targetPath = new URL(url).pathname;
+
+            // Hard-navigate whenever routing to/from home to avoid stale SPA animation state.
+            if (isHomePath(window.location.pathname) || isHomePath(targetPath)) {
+                window.location.href = url;
+                return;
+            }
 
             // Close mobile menu if open
             const rightNav = document.querySelector('.right-nav');
@@ -291,6 +323,13 @@
         // ── Popstate (browser back/forward) ───────────────────────────────────
         window.addEventListener('popstate', async () => {
             const url = window.location.href;
+            const path = new URL(url).pathname;
+
+            // Back/forward involving home should reload cleanly.
+            if (isHomePath(path)) {
+                window.location.reload();
+                return;
+            }
             const spaMain = document.getElementById('spa-main');
 
             // Cache hit
