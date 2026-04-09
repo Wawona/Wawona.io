@@ -50,7 +50,7 @@ Stay up to date with development progress, ask questions, and share feedback:
 
 Follow development on GitHub to get notified of new releases:
 
-👉 **[github.com/aspauldingcode/Wawona](https://github.com/aspauldingcode/Wawona)**
+👉 **[github.com/Wawona/Wawona](https://github.com/Wawona/Wawona)**
 
 > **TL;DR:** You do **not** need Nix, Rust, Xcode, or any developer tools. When Wawona ships, it will be a one-click install from the App Store or Play Store. Until then, join the [Discord](https://discord.gg/wHVSV52uw5) and the iOS [TestFlight](https://discord.gg/wHVSV52uw5) beta.
 

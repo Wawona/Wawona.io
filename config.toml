@@ -41,5 +41,5 @@ menu = [
 ]
 
 socials = [
-    { name = "github", url = "https://github.com/aspauldingcode/Wawona", icon = "github" },
+    { name = "github", url = "https://github.com/Wawona/Wawona", icon = "github" },
 ]
