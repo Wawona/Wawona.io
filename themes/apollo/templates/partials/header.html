@@ -9,6 +9,9 @@
     {% if config.extra.fediverse %}
     <meta name="fediverse:creator" content="{{ config.extra.fediverse_creator }}" />
     {% endif %}
+    
+    <!-- Adds RSS feed auto-discovery -->
+    <link rel="alternate" type="application/atom+xml" title="Wawona Blog Feed" href="{{ get_url(path='atom.xml') }}">
 
     {% if page.extra.meta %}
     <!-- the meta data config goes here  -->
@@ -19,9 +22,6 @@
         page_has_description=true -%} {% endif %} {{ key }} None="{{ value }}" {% endfor %} />
     {% endfor %}
     {% endif %}
-
-    <!-- Adds RSS feed auto-discovery -->
-    <link rel="alternate" type="application/atom+xml" title="Wawona Atom Feed" href="{{ get_url(path='atom.xml') }}">
 
     {# Site title #}
     {% set current_path = current_path | default(value="/") %}
@@ -362,3 +362,4 @@
         }
     </style>
 </head>
+
