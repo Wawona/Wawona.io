@@ -20,6 +20,9 @@
     {% endfor %}
     {% endif %}
 
+    <!-- Adds RSS feed auto-discovery -->
+    <link rel="alternate" type="application/atom+xml" title="Wawona Atom Feed" href="{{ get_url(path='atom.xml') }}">
+
     {# Site title #}
     {% set current_path = current_path | default(value="/") %}
     {% if current_path == "/" %}
